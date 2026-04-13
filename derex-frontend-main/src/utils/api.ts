@@ -182,7 +182,7 @@ export async function getContratosAdhesion() {
     }
   });
   } catch {
-    if (isDevelopment) return {} as ContratosDeAdhesionResponse;
+    if (isDevelopment) return [] as unknown as ContratosDeAdhesionResponse;
     throw new ApiError("No fue posible obtener los contratos", 503);
   }
 }
@@ -645,7 +645,7 @@ export async function getAmenitiesByProjectId(
     }
   });
   } catch {
-    if (isDevelopment) return {} as AmenitiesResponse;
+    if (isDevelopment) return { success: false, amenities: [] } as unknown as AmenitiesResponse;
     throw new ApiError("No fue posible obtener las amenidades", 503);
   }
 }
@@ -870,7 +870,7 @@ export async function getFAQs() {
     }
   });
   } catch {
-    if (isDevelopment) return {} as FrequentQuestionResponse;
+    if (isDevelopment) return { data: [] } as unknown as FrequentQuestionResponse;
     throw new ApiError("No fue posible obtener las preguntas frecuentes", 503);
   }
 }
@@ -912,7 +912,7 @@ export async function getAllClientExperiences() {
     }
   });
   } catch {
-    if (isDevelopment) return {} as ClientExperienceListResponse;
+    if (isDevelopment) return { data: [] } as unknown as ClientExperienceListResponse;
     throw new ApiError("No fue posible obtener las experiencias", 503);
   }
 }
@@ -1003,7 +1003,7 @@ export async function getDecalogues(type: "decalogue" | "notice") {
     }
   });
   } catch {
-    if (isDevelopment) return {} as DecaloguesResponse;
+    if (isDevelopment) return { data: [] } as unknown as DecaloguesResponse;
     throw new ApiError("No fue posible obtener el decálogo", 503);
   }
 }
@@ -1045,7 +1045,7 @@ export async function getAllCertificationsAndAwards() {
     }
   });
   } catch {
-    if (isDevelopment) return {} as CertificationsAndAwardsResponse;
+    if (isDevelopment) return { data: [] } as unknown as CertificationsAndAwardsResponse;
     throw new ApiError("No fue posible obtener las certificaciones", 503);
   }
 }
@@ -1101,7 +1101,7 @@ export async function getFeaturedBlogs(locale: string) {
     }
   });
   } catch {
-    if (isDevelopment) return {} as BlogsResponse;
+    if (isDevelopment) return { data: [] } as unknown as BlogsResponse;
     throw new ApiError("No fue posible obtener los blogs destacados", 503);
   }
 }
@@ -1136,7 +1136,7 @@ export async function getLatestBlogs(locale: string, limit: number = 5) {
     }
   });
   } catch {
-    if (isDevelopment) return {} as BlogsResponse;
+    if (isDevelopment) return { data: [] } as unknown as BlogsResponse;
     throw new ApiError("No fue posible obtener los últimos blogs", 503);
   }
 }
@@ -1225,7 +1225,7 @@ export async function getBlogsByCategory(
     }
   });
   } catch {
-    if (isDevelopment) return {} as BlogsResponse;
+    if (isDevelopment) return { data: [] } as unknown as BlogsResponse;
     throw new ApiError("No fue posible obtener los blogs", 503);
   }
 }
@@ -1257,7 +1257,7 @@ export async function getBlogTopics(locale: string) {
     }
   });
   } catch {
-    if (isDevelopment) return {} as BlogTopicsResponse;
+    if (isDevelopment) return { data: [] } as unknown as BlogTopicsResponse;
     throw new ApiError("No fue posible obtener los temas del blog", 503);
   }
 }
@@ -1290,7 +1290,7 @@ export async function getBlogCategories(locale: string) {
     }
   });
   } catch {
-    if (isDevelopment) return {} as BlogCategoryResponse;
+    if (isDevelopment) return { data: [] } as unknown as BlogCategoryResponse;
     throw new ApiError("No fue posible obtener las categorías del blog", 503);
   }
 }
