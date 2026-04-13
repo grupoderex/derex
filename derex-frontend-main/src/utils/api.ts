@@ -235,7 +235,8 @@ export async function getMedia() {
     });
     return await response.json();
   } catch {
-    throw new Error("Error desconocido");
+    if (isDevelopment) return [] as WebsiteMedia[];
+    throw new ApiError("No fue posible obtener los estilos del sitio", 503);
   }
 }
 
