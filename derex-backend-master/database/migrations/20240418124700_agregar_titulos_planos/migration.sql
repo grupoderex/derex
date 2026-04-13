@@ -1,0 +1,1 @@
+ALTER TABLE project_property_blueprints ADD COLUMN title json null;

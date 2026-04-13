@@ -1,0 +1,197 @@
+.credit-sim-container {
+  align-self: stretch;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.credit-sim-image {
+  width: 100%;
+  height: 0%;
+  opacity: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  background-image: url("../../assets/images/credito-image.png");
+  background-size: cover;
+  background-position: center;
+  transition: 1s;
+  animation-delay: 1s;
+  animation-duration: 1s;
+  animation-name: csi-in;
+  animation-fill-mode: forwards;
+  overflow: hidden;
+}
+
+@keyframes csi-in {
+  0% {
+    opacity: 0;
+    height: 0%;
+  }
+  100% {
+    opacity: 1;
+    height: 50%;
+  }
+}
+
+@keyframes csb-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.credit-sim-title {
+}
+
+.credit-sim-subtitle {
+}
+
+.credit-sim-box {
+  background-color: var(--lightest-grey);
+  display: flex;
+  align-self: center;
+  margin: 1em;
+  padding: 1em;
+  border-radius: 0.25em;
+  font-size: 0.8rem;
+  animation-delay: 0.5s;
+  animation-duration: 2s;
+  animation-name: csb-in;
+  opacity: 0;
+  animation-fill-mode: forwards;
+}
+
+.credit-sim-box-column {
+  display: flex;
+  flex-direction: column;
+  margin: 1em;
+}
+.credit-sim-title {
+  font-weight: 700;
+  color: black;
+}
+
+.credit-input-prefix-span {
+  margin-top: 2em;
+  border: 1px solid var(--main-grey);
+  border-radius: 0.25em;
+  padding: 0.5em;
+  color: var(--main-grey);
+  display: flex;
+  align-items: center;
+}
+.credit-input-prefix-span > input {
+  background-color: transparent;
+  outline: none;
+  border: none;
+  color: var(--main-grey);
+  font-weight: 400;
+}
+
+.credit-sim-image > h1 {
+  color: white;
+  text-transform: uppercase;
+  font-size: 4rem;
+  margin: 0;
+  font-family: "Viga";
+  width: 12em;
+  margin: 0;
+  /* opacity: 0.1; */
+}
+
+.credit-sim-image > h1 > span {
+  display: block;
+  font-family: "Viga";
+}
+
+.credit-sim-image > h1 > span:nth-of-type(2) {
+  margin-left: 1em;
+}
+
+.credit-sim-image > p {
+  text-transform: uppercase;
+  color: white;
+  width: 48em;
+  padding-right: 14em;
+  box-sizing: border-box;
+  margin: 0;
+  margin-bottom: 1em;
+  /* opacity: 0.1; */
+}
+
+.credit-result-row {
+  font-size: 1.5rem;
+  color: black;
+  display: flex;
+  font-weight: 700;
+  margin-top: 1.5em;
+  align-items: flex-end;
+}
+.credit-result-row > div:nth-of-type(1) {
+  min-width: 6em;
+}
+.credit-result-row > div:nth-of-type(2) {
+  font-size: 0.75rem;
+  margin-left: 0.25em;
+}
+
+.credit-button {
+  background-color: var(--lightest-grey);
+  color: var(--main-grey);
+  padding: 1em;
+  align-self: flex-end;
+  border-radius: 0.25em;
+}
+
+.credit-footer {
+  margin-top: 1.5em;
+  margin-right: 9em;
+  display: flex;
+  flex-direction: column;
+}
+
+.credit-footer > sub {
+  color: var(--main-grey);
+  margin-top: 2em;
+  align-self: flex-end;
+}
+
+.credit-row {
+  display: flex;
+}
+
+@media (max-width: 1000px) {
+  .credit-sim-box {
+    flex-direction: column;
+    width: calc(100% - 4em);
+  }
+  .credit-sim-image > h1 {
+    margin-top: 2em;
+    font-size: 7vw;
+  }
+  .credit-sim-image > p {
+    margin: 0;
+    width: auto;
+    padding: 3em;
+  }
+
+  .credit-footer {
+    margin: 1em;
+    margin-top: 0;
+    display: flex;
+    flex-direction: row;
+    /* margin-bottom: 1em; */
+  }
+  .credit-footer > sub {
+    margin: 0;
+    margin-left: 1em;
+    align-self: center;
+  }
+  .credit-input-prefix-span {
+    margin-top: 1em;
+  }
+}

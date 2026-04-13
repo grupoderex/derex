@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"path": "derex-frontend-main"
+		},
+		{
+			"path": "derex-backend-master"
+		},
+		{
+			"path": "derex-admin-new-main"
+		},
+		{
+			"path": "derex-blog-cms"
+		},
+	],
+	"settings": {}
+}

@@ -1,0 +1,415 @@
+================================================================================
+
+  13. CARACTERISTICAS AWS t3.large (REFERENCIA)
+================================================================================
+
+Si cada instancia (frontend y backend) sera t3.large, estas son las
+caracteristicas principales a considerar:
+
+  - 2 vCPU (Intel/AMD)
+  - 8 GiB de RAM
+  - Tipo "burstable" (usa creditos de CPU)
+  - Modo Unlimited por defecto (puede generar cargos extra si excede baseline)
+  - Baseline de CPU aproximado: 30% por vCPU (36 CPU credits/hora)
+  - Red: hasta 5 Gbps (segun carga y region)
+  - EBS-optimized por defecto
+
+Implicacion practica para este proyecto:
+
+  - FRONTEND (Next.js):
+    t3.large normalmente es suficiente para trafico bajo/medio,
+    especialmente si usan CDN en assets estaticos.
+
+  - BACKEND (Node + Express + MySQL client):
+    t3.large suele ser suficiente para trafico bajo/medio si no hay
+    procesos pesados de imagen en la misma instancia.
+
+  - ADMIN (Vite estatico):
+    No requiere t3.large; puede vivir en hosting estatico mas barato.
+
+Riesgos a vigilar en t3.large:
+
+  1) Creditos de CPU agotados:
+     Si la carga es sostenida (picos largos), el rendimiento baja o
+     suben costos por Unlimited.
+
+  2) Memoria en Next.js SSR:
+     SSR + alta concurrencia puede acercarse al limite de 8 GiB si no
+     hay ajuste de cache y reinicios controlados.
+
+  3) Co-ubicacion de servicios:
+     Si frontend y backend comparten una sola t3.large, el riesgo de
+     saturacion aumenta. Mejor separados (como lo plantean).
+
+Recomendacion minima para produccion estable:
+
+  - Mantener frontend y backend en instancias separadas.
+  - Activar monitoreo con CloudWatch (CPUUtilization, CPUCreditBalance,
+    Memory, Disk, NetworkIn/Out).
+  - Configurar alertas: CPU > 70% sostenido, CPUCreditBalance bajo,
+    memoria > 80%.
+  - Definir politica de escalamiento:
+      * Si CPU sostenido alto: migrar backend a m6i.large/c6i.large.
+      * Si SSR consume mucha RAM: subir frontend a t3.xlarge o mover a
+        plataforma administrada (Amplify/Vercel).
+
+Resumen ejecutivo:
+  Si, t3.large es una base razonable para arrancar el clon de Derex,
+  pero con monitoreo activo. Si esperan trafico alto o campanas
+  constantes, conviene planear desde inicio un tipo no-burstable.
+
+================================================================================
+  CONSIDERACIONES TÉCNICAS PARA IMPLEMENTACIÓN — DEREX
+  Proyecto: Clon del sitio Javer
+  Fecha: Marzo 2026
+================================================================================
+
+El sitio está compuesto por 3 repositorios independientes:
+
+  1. javer-frontend-main   → Next.js 14 (App Router), SSR + SSG
+  2. javer-backend-master  → Node.js + Express + Knex.js, API REST
+  3. javer-admin-new-main  → React + Vite, panel de administración
+
+Cada uno requiere su propio servidor / proceso / variables de entorno.
+
+================================================================================
+  1. INFRAESTRUCTURA — DÓNDE CORRER CADA PIEZA
+================================================================================
+
+BACKEND (javer-backend-master)
+  - Node.js 18+
+  - Proceso gestionado con PM2 (incluye ecosystem.config.js)
+  - En Javer corre en EC2 Ubuntu: /opt/javer-backend
+  - Comando de inicio: pm2 start ecosystem.config.js
+  - Puerto: 3000 (configurable vía ENV PORT)
+  - IMPORTANTE: El backend y el frontend pueden vivir en instancias 
+    separadas sin problema. Solo hay que asegurarse que el frontend
+    pueda llegar al backend vía HTTPS (ver ENV vars de frontend).
+
+FRONTEND (javer-frontend-main)
+  - Next.js requiere un runtime Node.js activo (NO es sitio estático puro)
+  - El repo incluye `amplify.yml`, pero si no usan Amplify en prod NO hay
+    que mover nada por ese archivo (se puede ignorar)
+  - Alternativas igualmente válidas: Vercel, EC2 con PM2, Railway, Render
+  - Comando de build: yarn build / npm run build
+  - Comando de inicio: yarn start / npm start (puerto 3001 recomendado si 
+    el backend está en el mismo servidor en 3000)
+
+ADMIN (javer-admin-new-main)
+  - React + Vite → genera dist/ estático
+  - Entregable para sistemas: carpeta dist/ (build listo para publicar)
+  - Se puede servir desde cualquier hosting estático: S3 + CloudFront,
+    Netlify, Vercel, Nginx, etc.
+  - Solo necesita apuntar a la URL del backend vía VITE_API_BASE_URL
+  - Incluye vercel.json (configurado para Vercel)
+
+BASE DE DATOS
+  - MySQL 8+
+  - En Javer: RDS de AWS, pero puede ser cualquier MySQL administrado
+    (PlanetScale, Railway, instancia propia, etc.)
+  - Ejecutar las migraciones: node node_scripts/migrate.js
+
+================================================================================
+  2. SALESFORCE CRM — EL CAMBIO MÁS IMPORTANTE
+================================================================================
+
+SITUACIÓN ACTUAL EN JAVER:
+  Todos los formularios de contacto del sitio (formulario principal,
+  formulario de desarrollos, formulario de proyecto específico) envían
+  los datos directamente a Salesforce mediante Web-to-Lead.
+
+  Flujo actual:
+    Usuario llena formulario → Backend → Salesforce Web-to-Lead API
+    → Salesforce crea el Lead → Redirige a /gracias
+
+  Archivos involucrados:
+    - utils/salesforce.js          → clase SalesforceService
+    - api/contact/contact.routes.js → 3 endpoints que llaman a Salesforce
+    - config.js                    → SALESFORCE_URL_PREFIX, SALESFORCE_ORG_ID
+
+  Variables de entorno necesarias (backend .env):
+    SALESFORCE_URL_PREFIX=webto        ← "webto" en prod, "test" en sandbox
+    SALESFORCE_ORG_ID=00Do0000000b6Io  ← ID de la organización Salesforce
+
+  Variables de entorno (frontend .env):
+    (el frontend no llama directamente a Salesforce, solo al backend)
+
+LO QUE DEREX NECESITA HACER:
+  Opción A — Si Derex SÍ tiene Salesforce:
+    • Crear una organización Salesforce o usar la existente
+    • Configurar Web-to-Lead en Salesforce
+    • Obtener su propio ORG_ID y reemplazarlo en las ENV vars
+    • Cambiar los campos del lead si sus nombres de campo en SF son distintos
+      (ver utils/salesforce.js → buildSalesforceParams)
+    • Actualizar la URL de retorno (retURL): actualmente apunta a
+      "https://www.javer.com.mx/gracias" → cambiar al dominio de Derex
+
+  Opción B — Si Derex NO tiene Salesforce:
+    • Deben reemplazar la lógica de salesforce.js por su propio CRM o
+      por un envío de email simple
+    • El backend ya tiene Nodemailer configurado (utils/email.js), pueden
+      reutilizarlo para guardar leads por email en lugar de Salesforce
+    • Endpoints a modificar: todos los que llaman a SalesforceService en
+      api/contact/contact.routes.js (3 rutas: /submit, /home/submit, 
+      /project/submit)
+
+================================================================================
+  3. ALMACENAMIENTO DE IMÁGENES — AWS S3
+================================================================================
+
+SITUACIÓN ACTUAL EN JAVER:
+  Todas las imágenes subidas desde el admin (propiedades, proyectos,
+  amenidades, blog, etc.) se guardan en un bucket de AWS S3 y se sirven
+  a través de un CDN (CloudFront).
+
+  Variables de entorno necesarias (backend .env):
+    AWS_ACCESS_KEY_ID=...
+    AWS_SECRET_ACCESS_KEY=...
+    AWS_BUCKET_NAME=...         ← nombre del bucket S3
+    AWS_CDN_URL=https://...     ← URL base del CDN (CloudFront o S3 directo)
+    AWS_S3_URL=https://...      ← URL base del S3 (para compatibilidad legacy)
+
+  Si estas variables NO están configuradas, el backend automáticamente
+  cae en modo local: guarda las imágenes en la carpeta /uploads/ del
+  servidor (modo fallback implementado en models/media_sql.js).
+
+LO QUE DEREX NECESITA HACER:
+  Opción A — AWS S3 (recomendado para producción):
+    • Crear bucket S3 en AWS con permisos públicos de lectura
+    • Crear usuario IAM con permisos s3:PutObject al bucket
+    • Opcionalmente crear distribución CloudFront apuntando al bucket
+    • Configurar las 4 ENV vars (ACCESS_KEY, SECRET_KEY, BUCKET_NAME, CDN_URL)
+
+  Opción B — Otro proveedor de Object Storage:
+    • El backend usa el SDK de AWS (aws-sdk v2), pero S3 es compatible
+      con muchos servicios: Cloudflare R2, DigitalOcean Spaces, MinIO, etc.
+    • Solo hay que asegurarse de que el endpoint sea compatible con la
+      API de S3 y configurar region + endpoint en AWSConfig.js
+
+  Opción C — Solo carpeta local /uploads/ (staging/desarrollo):
+    • Dejar las ENV vars de AWS vacías y el backend guarda en /uploads/
+    • En este caso el frontend necesita que el backend sirva esa carpeta
+      (ya está configurado: app.use("/uploads", express.static(...)))
+    • NO recomendado para producción (las imágenes se pierden en redeployments)
+
+  IMPORTANTE — Frontend next.config.ts:
+    Los dominios de imágenes permitidos están hardcodeados. Al cambiar de
+    bucket/CDN hay que actualizar next.config.ts → images.remotePatterns:
+      • Agregar el hostname del nuevo CDN/S3 de Derex
+      • Pueden eliminar "javer-api-dev-page.s3.us-east-2.amazonaws.com"
+        y "www.javer.com.mx" si no son relevantes para Derex
+
+================================================================================
+  4. CORREO ELECTRÓNICO (NODEMAILER + OFFICE 365)
+================================================================================
+
+SITUACIÓN ACTUAL EN JAVER:
+  El backend usa Nodemailer para enviar notificaciones por email en 3 flujos:
+    1. Formulario de lotes      → EMAIL_USER / EMAIL_PASS
+    2. Atención al cliente      → EMAIL_ATENCION_CLIENTE_USER / PASS
+    3. Próximos lanzamientos    → EMAIL_PROXIMOS_LANZAMIENTOS_USER / PASS
+
+  Todos usan smtp.office365.com:587 (Microsoft 365 / Outlook corporativo).
+
+  Variables de entorno necesarias (backend .env):
+    EMAIL_USER=...@dominio.com
+    EMAIL_PASS=...
+    EMAIL_LOTES=destinatario-lotes@dominio.com
+    EMAIL_RESERVAS=destinatario-reservas@dominio.com
+
+    EMAIL_ATENCION_CLIENTE_USER=...@dominio.com
+    EMAIL_ATENCION_CLIENTE_PASS=...
+    EMAIL_ATENCION_CLIENTE=destinatario-atencioncliente@dominio.com
+    EMAIL_ATENCION_CLIENTE_CC_1=...   (hasta CC_5, opcionales)
+    EMAIL_ATENCION_CLIENTE_CCO_1=...  (hasta CCO_2, opcionales)
+
+    EMAIL_PROXIMOS_LANZAMIENTOS_USER=...@dominio.com
+    EMAIL_PROXIMOS_LANZAMIENTOS_PASS=...
+
+LO QUE DEREX NECESITA HACER:
+  • Si usan Microsoft 365: solo reemplazar credenciales en las ENV vars
+  • Si usan Gmail u otro SMTP: cambiar host/port en utils/email.js
+    (las 3 configuraciones de authConfig están en ese archivo)
+  • Definir a qué correos llegan las notificaciones de cada flujo
+
+================================================================================
+  5. GOOGLE RECAPTCHA v2
+================================================================================
+
+SITUACIÓN ACTUAL EN JAVER:
+  Todos los formularios de contacto están protegidos con Google reCAPTCHA.
+  La verificación se hace en el backend antes de enviar a Salesforce.
+
+  Variables de entorno necesarias:
+    RECAPTCHA_SECRET_KEY=...   ← backend (.env)
+    (la llave pública/site key va hardcodeada en los componentes del frontend
+     o en una variable NEXT_PUBLIC_RECAPTCHA_SITE_KEY si la agregan)
+
+LO QUE DEREX NECESITA HACER:
+  • Registrar el dominio de Derex en console.cloud.google.com →
+    "reCAPTCHA Admin" → crear nuevo site (tipo v2 Checkbox o Invisible)
+  • Obtener la Site Key (para el frontend) y la Secret Key (para el backend)
+  • Reemplazar RECAPTCHA_SECRET_KEY en el .env del backend
+  • Buscar en el frontend dónde está hardcodeada la site key pública y reemplazarla
+
+================================================================================
+  6. GOOGLE MAPS
+================================================================================
+
+SITUACIÓN ACTUAL EN JAVER:
+  El mapa de proyectos usa Google Maps JavaScript API.
+
+  Variable de entorno (frontend .env):
+    NEXT_PUBLIC_REACT_APP_GOOGLE_MAPS_KEY=...
+
+LO QUE DEREX NECESITA HACER:
+  • Crear proyecto en console.cloud.google.com
+  • Habilitar "Maps JavaScript API" y "Geocoding API"
+  • Crear API Key restringida al dominio de Derex
+  • Configurar NEXT_PUBLIC_REACT_APP_GOOGLE_MAPS_KEY en el .env del frontend
+  • Agregar método de pago en Google Cloud (Maps tiene costo después del free tier)
+
+================================================================================
+  7. VARIABLES DE ENTORNO — RESUMEN COMPLETO
+================================================================================
+
+--- BACKEND (.env) ---
+  # Base de datos
+  DB_HOST=
+  DB_USER=
+  DB_PASSWORD=
+  DB_NAME=
+  PORT=3000
+
+  # AWS S3 / CDN
+  AWS_ACCESS_KEY_ID=
+  AWS_SECRET_ACCESS_KEY=
+  AWS_BUCKET_NAME=
+  AWS_CDN_URL=                    ← URL base CDN (sin / al final)
+  AWS_S3_URL=                     ← URL base S3 (para compatibilidad)
+  LOCAL_MEDIA_BASE_URL=           ← Solo si usan modo local sin S3
+
+  # Salesforce
+  SALESFORCE_URL_PREFIX=webto     ← "webto" prod / "test" sandbox
+  SALESFORCE_ORG_ID=              ← ID org de Salesforce de Derex
+
+  # Google reCAPTCHA
+  RECAPTCHA_SECRET_KEY=
+
+  # Email (smtp.office365.com o el que usen)
+  EMAIL_USER=
+  EMAIL_PASS=
+  EMAIL_LOTES=
+  EMAIL_RESERVAS=
+  EMAIL_ATENCION_CLIENTE_USER=
+  EMAIL_ATENCION_CLIENTE_PASS=
+  EMAIL_ATENCION_CLIENTE=
+  EMAIL_ATENCION_CLIENTE_CC_1=    ← opcionales hasta CC_5
+  EMAIL_ATENCION_CLIENTE_CCO_1=   ← opcionales hasta CCO_2
+  EMAIL_PROXIMOS_LANZAMIENTOS_USER=
+  EMAIL_PROXIMOS_LANZAMIENTOS_PASS=
+
+  # Auth (JWT)
+  TOKEN_SECRET=                   ← string aleatorio secreto para JWT
+
+--- FRONTEND (.env.local) ---
+  NEXT_PUBLIC_REACT_APP_BACKEND_URL=https://api.derex.com
+  BACKEND_URL=https://api.derex.com        ← para SSR server-side
+  NEXT_PUBLIC_REACT_APP_GOOGLE_MAPS_KEY=
+  NEXT_PUBLIC_REACT_APP_S3_URL=            ← URL base del CDN de imágenes
+  REACT_APP_PHONE_NUMBER=                  ← número de teléfono a mostrar
+  SITE_URL=https://www.derex.com           ← para el sitemap/robots.txt
+  NODE_ENV=production
+
+--- ADMIN (.env) ---
+  VITE_API_BASE_URL=https://api.derex.com
+  VITE_FRONTEND_URL=https://www.derex.com
+
+================================================================================
+  8. CONTENIDO DEL SITIO — BRANDING JAVER EMBEBIDO
+================================================================================
+
+Hay referencias a la marca Javer hardcodeadas que Derex necesita cambiar:
+
+  - Blog externo: src/constants.ts línea 3
+      BLOG_URL = "https://blog.javer.com.mx"
+      → Cambiar al blog de Derex o eliminar la sección de blog
+
+  - URL de redirect post-formulario: utils/salesforce.js
+      retURL = "https://www.javer.com.mx/gracias"
+      → Cambiar al dominio de Derex
+
+  - Nombre "Javer" en asuntos de emails: api/customer_support/customer_support.routes.js
+      subject: "Soporte al Cliente - Javer"
+      → Cambiar a "Soporte al Cliente - Derex"
+
+  - Imágenes / logos en /public/images/ y /src/assets/
+      → Reemplazar con los assets de Derex
+
+  - Textos en i18n: src/i18n/ (si existe localización)
+      → Revisar y actualizar textos con la marca Derex
+
+  - next.config.ts → images.remotePatterns
+      → Reemplazar hostname de S3 de Javer con el de Derex
+
+================================================================================
+  9. SITEMAP Y SEO
+================================================================================
+
+  - El sitemap se genera automáticamente con next-sitemap
+  - Requiere la ENV var SITE_URL=https://www.derex.com en el build
+  - Se genera en el build: yarn postbuild (si el script está configurado)
+  - El robots.txt también se genera automáticamente apuntando a SITE_URL
+  - Revisar next-sitemap.config.js si necesitan excluir rutas específicas
+
+================================================================================
+  10. CORS
+================================================================================
+
+  - El backend tiene CORS abierto: app.use(cors({ origin: "*" }))
+  - Para producción se recomienda restringir el origin al dominio del frontend
+    y del admin de Derex:
+
+    app.use(cors({
+      origin: ["https://www.derex.com", "https://admin.derex.com"]
+    }))
+
+  - Cambiar en: javer-backend-master/app.js
+
+================================================================================
+  11. AUTENTICACIÓN DEL ADMIN
+================================================================================
+
+  - El admin usa JWT para proteger rutas
+  - El TOKEN_SECRET en el .env debe ser un string largo y aleatorio
+    (mínimo 32 caracteres) — NO usar el mismo que Javer
+  - Los usuarios del admin viven en la tabla 'users' de la base de datos
+  - Al hacer deploy inicial crear el primer usuario admin vía script o
+    directamente en la DB con password hasheado (bcrypt)
+
+================================================================================
+  12. CHECKLIST DE DEPLOY
+================================================================================
+
+  □ Servidor / instancia levantada con Node.js 18+
+  □ MySQL 8+ disponible y accesible desde el backend
+  □ Migraciones ejecutadas: node node_scripts/migrate.js
+  □ .env del backend con todas las variables configuradas
+  □ .env.local del frontend con todas las variables configuradas
+  □ AWS S3 bucket creado (o alternativa configurada)
+  □ Salesforce configurado (o reemplazado por alternativa)
+  □ Google reCAPTCHA registrado con el dominio de Derex
+  □ Google Maps API Key creada y restringida al dominio de Derex
+  □ Cuentas de email SMTP configuradas (3 cuentas diferentes)
+  □ Branding Javer reemplazado por Derex en código y assets
+  □ next.config.ts actualizado con el hostname del CDN de Derex
+  □ CORS restringido al dominio de Derex en app.js
+  □ TOKEN_SECRET generado de forma segura y único
+  □ SITE_URL configurada correctamente para sitemap/SEO
+  □ PM2 configurado en el servidor del backend (ecosystem.config.js)
+  □ Admin: primer usuario creado en la DB
+  □ Prueba de formulario de contacto end-to-end
+  □ Prueba de subida de imagen desde el admin
+  □ SSL/HTTPS configurado en todos los dominios
+
+================================================================================

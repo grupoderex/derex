@@ -1,0 +1,461 @@
+================================================================================
+  GUÍA DE DESPLIEGUE — PERSONA DE SISTEMAS (DEREX)
+  Proyecto: Sitio web Derex (Clon Javer)
+  Fecha: Marzo 2026
+================================================================================
+
+Este documento es exclusivo para el equipo de sistemas/infraestructura.
+La configuración de contenido y variables específicas del negocio
+(Salesforce, correos, branding) la proporciona el equipo de Javer.
+
+================================================================================
+  RESUMEN EJECUTIVO
+================================================================================
+
+Son 3 aplicaciones independientes que deben correr simultáneamente:
+
+  COMPONENTE   TECNOLOGÍA          PUERTO SUGERIDO              TIPO
+  -----------  ------------------  ---------------------------  -----------------------
+  Backend      Node.js 20 + Express    3000                     Proceso persistente
+  Frontend     Next.js 14 (SSR)        3001                     Proceso persistente (*)
+  Admin        React + Vite            Sin puerto publico (**)  Sitio estatico (SPA)
+  Base de datos  MySQL 8+             3306                     Servicio de BD
+
+(*) Next.js NO es un sitio estático puro. Requiere un proceso Node.js
+    corriendo en todo momento para hacer Server Side Rendering (SSR).
+(**) Recomendación simple en producción: servir el admin como archivos
+     estaticos detras de Nginx/CDN (sin puerto publico dedicado).
+     Aunque sea estatico, sigue siendo interactivo: el navegador ejecuta
+     JavaScript y consume la API para login, altas, ediciones y cargas.
+
+================================================================================
+  REQUERIMIENTOS DE SERVIDOR
+================================================================================
+
+REFERENCIA DE INSTANCIA (Javer usa AWS t3.large x2, pero NO es obligatorio):
+
+  t3.large (o equivalente en cualquier proveedor):
+    - 2 vCPU
+    - 8 GB RAM
+
+  Cualquier VPS o servidor dedicado con esas características es válido.
+  Ejemplos equivalentes fuera de AWS:
+    - DigitalOcean: Droplet 8GB
+    - Linode/Akamai: Dedicated 8GB
+    - Hetzner: CX31 o CPX31
+    - Azure: Standard_B2ms
+    - GCP: e2-standard-2
+    - Servidor propio con Ubuntu 22.04+
+
+  SERVIDOR 1 — Backend API + MySQL (o BD en servidor separado)
+  SERVIDOR 2 — Frontend Next.js
+
+  El Admin (panel estático) puede servirse desde cualquier hosting
+  estático, un bucket de objeto, o Nginx en cualquiera de los servidores.
+  No necesita servidor dedicado.
+
+SOFTWARE REQUERIDO EN CADA SERVIDOR:
+  - Ubuntu 22.04 LTS (o cualquier Linux moderno)
+  - Node.js 20.x (via nvm o nodesource)
+  - npm / yarn
+  - PM2 (gestor de procesos): npm install -g pm2
+  - Git
+  - (Opcional pero recomendado) Nginx como reverse proxy
+
+EN EL SERVIDOR DE BASE DE DATOS:
+  - MySQL 8.0+
+  - Crear base de datos y usuario con permisos completos sobre ella
+
+================================================================================
+  GESTIÓN DE PROCESOS
+================================================================================
+
+OPCIÓN A — PM2 DIRECTO (lo que usa Javer, ya incluido en el repositorio)
+  El repositorio del backend incluye ecosystem.config.js listo para PM2.
+  Es la opción más directa: no requiere configuración extra y está
+  probada en producción por Javer.
+
+  # Instalar PM2 globalmente
+  npm install -g pm2
+
+  # Iniciar el backend
+  cd /ruta/al/backend
+  pm2 start ecosystem.config.js
+
+  # Iniciar el frontend Next.js
+  cd /ruta/al/frontend
+  pm2 start npm --name "frontend" -- start
+
+  # Guardar para reinicio automático en reboot
+  pm2 save
+  pm2 startup
+
+OPCIÓN B — DOCKER COMPOSE (alternativa Recomendada - Docker)
+  No está implementado en el repositorio, pero este flujo es más amigable para los despliegues futuros. El equipo de Javer puede preparar
+  los Dockerfiles y docker-compose.yml si se confirma este enfoque.
+
+  Ventajas:
+    - Un solo comando levanta todo: docker compose up -d
+    - Entorno reproducible en cualquier servidor sin instalar dependencias
+    - Fácil rollback cambiando el tag de imagen
+
+  Arquitectura propuesta:
+  ┌─────────────────────────────────────────────────────┐
+  │  ┌──────────┐  ┌──────────┐  ┌──────────────────┐  │
+  │  │ backend  │  │ frontend │  │      mysql        │  │
+  │  │ :3000    │  │ :3001    │  │      :3306        │  │
+  │  └──────────┘  └──────────┘  └──────────────────┘  │
+  │            └──────────────── red interna Docker      │
+  └─────────────────────────────────────────────────────┘
+                    │
+              Nginx :80/:443
+
+  Confirmar con Javer si se requiere este enfoque para preparar los
+  archivos necesarios.
+
+================================================================================
+  VARIABLES DE ENTORNO
+================================================================================
+
+CADA COMPONENTE TIENE SU PROPIO ARCHIVO .env.
+Los valores específicos (credenciales, API keys) los provee el equipo
+de negocio/desarrollo. El equipo de sistemas solo necesita:
+
+  1. Crear los archivos en el servidor antes de iniciar los procesos
+  2. Asegurarse de que NO estén en el repositorio Git (ya están en .gitignore)
+  3. Restringir permisos del archivo: chmod 600 .env
+
+  BACKEND: /ruta/backend/.env
+    → Contiene: DB, storage de imágenes (S3/R2/equiv.), CRM, correo SMTP, reCAPTCHA, JWT secret
+
+  FRONTEND: /ruta/frontend/.env.local
+    → Contiene: URL del backend, Google Maps key, URL del CDN de imágenes
+
+  ADMIN: /ruta/admin/.env
+    → Contiene: URL del backend
+
+  El equipo de Javer entregará los valores de cada variable.
+
+================================================================================
+  ALMACENAMIENTO DE ARCHIVOS / IMÁGENES
+================================================================================
+
+El backend usa el SDK de AWS (aws-sdk v2) para subir imágenes desde el
+panel admin. Se recomiendan dos opciones sin modificar el código:
+
+OPCIÓN RECOMENDADA — Cloudflare R2
+  Compatible 100% con la API de S3. Solo requiere agregar 1 línea de
+  configuración (el endpoint) en el código — el equipo de desarrollo
+  lo hace en minutos.
+
+  Pasos para sistemas:
+    1. Crear cuenta en Cloudflare (cloudflare.com)
+    2. Activar R2 Object Storage en el dashboard
+    3. Crear un bucket
+    4. Crear un API Token con permisos de lectura/escritura al bucket
+    5. Activar el dominio público del bucket (o conectar dominio propio)
+    6. Proveer al equipo de desarrollo:
+         Account ID, Access Key ID, Secret Access Key, Bucket Name, URL pública
+
+  Costos aproximados de Cloudflare R2:
+    - Almacenamiento:  $0.015 USD/GB al mes
+    - Operaciones PUT: $4.50 USD por millón de solicitudes
+    - Descarga (egress): GRATIS (esta es la gran ventaja vs S3)
+    - Free tier:       10 GB almacenamiento + 1M operaciones/mes gratis
+    En un sitio inmobiliario con uso normal el costo mensual
+    suele quedarse dentro del free tier o ser menor a $5 USD/mes.
+
+OPCIÓN ALTERNATIVA — AWS S3 + CloudFront (lo que usa Javer)
+  Si Derex ya tiene cuenta de AWS, es la opción más directa ya que
+  el código no necesita ningún cambio.
+
+  Pasos para sistemas:
+    1. Crear bucket S3 con acceso público de lectura
+    2. (Recomendado) Distribución CloudFront apuntando al bucket
+    3. Crear usuario IAM con permiso s3:PutObject
+    4. Proveer al equipo de desarrollo:
+         AWS_ACCESS_KEY_ID / AWS_SECRET_ACCESS_KEY / AWS_BUCKET_NAME / AWS_CDN_URL
+
+  Costos aproximados de AWS S3:
+    - Almacenamiento:  $0.023 USD/GB al mes (us-east-1)
+    - Operaciones PUT: $0.005 USD por 1,000 solicitudes
+    - Descarga (egress): $0.09 USD/GB  ← este costo sube con el tráfico
+    - CloudFront reduce el egress de S3 pero tiene su propio costo
+    Se recomienda R2 si no hay cuenta AWS existente, precisamente
+    por eliminar los costos de egress.
+
+DECISIÓN: El equipo de sistemas elige la opción y comunica al equipo
+de desarrollo cuál usarán para configurar las variables correspondientes.
+
+================================================================================
+  BASE DE DATOS
+================================================================================
+
+  Motor requerido: MySQL 8.0+  (este sí es el único requisito fijo)
+  Puerto por defecto: 3306
+
+  Pasos:
+  1. Crear la base de datos vacía:
+       CREATE DATABASE nombre_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+  2. Crear usuario con permisos:
+       CREATE USER 'usuario'@'%' IDENTIFIED BY 'password_seguro';
+       GRANT ALL PRIVILEGES ON nombre_db.* TO 'usuario'@'%';
+       FLUSH PRIVILEGES;
+
+  3. Ejecutar las migraciones desde el backend:
+       cd /ruta/backend
+       node node_scripts/migrate.js
+
+  Dónde hospedar la base de datos (cualquier opción funciona):
+    - MySQL en el mismo servidor del backend (más simple para empezar)
+    - MySQL en servidor dedicado propio
+    - AWS RDS MySQL 8  (managed service, lo que usa Javer)
+    - DigitalOcean Managed MySQL
+    - PlanetScale (serverless MySQL)
+    - Railway, Render u otro DBaaS
+    - Contenedor Docker con imagen mysql:8
+
+  Solo asegurarse que:
+    - El servidor del backend pueda alcanzar el host de MySQL (firewall/red)
+    - El host, usuario, contraseña y nombre de DB van en DB_HOST, DB_USER,
+      DB_PASSWORD, DB_NAME en el .env del backend
+
+================================================================================
+  RED Y SEGURIDAD (PUERTOS / SECURITY GROUPS)
+================================================================================
+
+  Puerto 22   → SSH (restringir a IPs conocidas del equipo)
+  Puerto 80   → HTTP (Nginx, redirige a 443)
+  Puerto 443  → HTTPS (Nginx + certificado SSL)
+  Puerto 3000 → Backend API (solo acceso interno / Nginx proxy, NO exponer)
+  Puerto 3001 → Frontend Next.js (solo acceso interno / Nginx proxy, NO exponer)
+  Puerto 3306 → MySQL (solo acceso desde el servidor del backend, NO exponer a internet)
+
+  REGLA: Los puertos 3000, 3001 y 3306 NO deben ser accesibles desde
+  internet. Todo el tráfico externo pasa por Nginx en 443.
+
+  Configurar en el firewall del proveedor elegido:
+    AWS → Security Groups | DigitalOcean → Cloud Firewall
+    Hetzner → Firewall Rules | Servidor propio → ufw o iptables
+
+================================================================================
+  NGINX — REVERSE PROXY
+================================================================================
+
+Nginx actúa como punto de entrada único al servidor y distribuye el
+tráfico a los procesos internos.
+
+Configuración sugerida (dos archivos de sitio en /etc/nginx/sites-available/):
+
+  --- api.derex.com (backend) ---
+  server {
+      listen 443 ssl;
+      server_name api.derex.com;
+
+      location / {
+          proxy_pass http://localhost:3000;
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection 'upgrade';
+          proxy_set_header Host $host;
+          proxy_cache_bypass $http_upgrade;
+      }
+  }
+
+  --- www.derex.com (frontend) ---
+  server {
+      listen 443 ssl;
+      server_name www.derex.com;
+
+      location / {
+          proxy_pass http://localhost:3001;
+          proxy_http_version 1.1;
+          proxy_set_header Upgrade $http_upgrade;
+          proxy_set_header Connection 'upgrade';
+          proxy_set_header Host $host;
+          proxy_cache_bypass $http_upgrade;
+      }
+  }
+
+  Para el admin (archivos estáticos, si lo sirve Nginx):
+  --- admin.derex.com ---
+  server {
+      listen 443 ssl;
+      server_name admin.derex.com;
+
+      root /ruta/al/admin/dist;
+      index index.html;
+
+      location / {
+          try_files $uri $uri/ /index.html;
+      }
+  }
+
+  El /index.html fallback es obligatorio para que React Router funcione.
+
+================================================================================
+  SSL / HTTPS
+================================================================================
+
+  Opción A — Certbot (Let's Encrypt, gratuito):
+    sudo apt install certbot python3-certbot-nginx
+    sudo certbot --nginx -d www.derex.com -d api.derex.com -d admin.derex.com
+
+  Opción B — Certificado del proveedor de nube (si aplica):
+    AWS: Certificate Manager (gratis con CloudFront/ALB)
+    DigitalOcean: SSL integrado en Load Balancer
+    Cloudflare: SSL automático si el dominio pasa por su proxy
+    Javer usa Certbot (Opción A) en sus servidores EC2.
+
+================================================================================
+  PROCESO DE BUILD — COMANDOS POR COMPONENTE
+================================================================================
+
+  BACKEND (no requiere build, solo instalar dependencias):
+    cd /ruta/backend
+    npm install --production
+    # Configurar .env antes de iniciar
+    node node_scripts/migrate.js   ← solo la primera vez o en migraciones
+    pm2 start ecosystem.config.js
+
+  FRONTEND (requiere build antes de iniciar):
+    cd /ruta/frontend
+    npm install
+    # Configurar .env.local antes de hacer build
+    npm run build                  ← genera carpeta .next/
+    pm2 start npm --name "frontend" -- start
+
+  ADMIN (genera archivos estáticos):
+    cd /ruta/admin
+    npm install
+    # Configurar .env antes de hacer build
+    npm run build                  ← genera carpeta dist/
+    # Copiar dist/ al directorio raíz de Nginx para admin.derex.com
+
+================================================================================
+  ENTREGA A SISTEMAS (ADMIN)
+================================================================================
+
+Que entregas tu al equipo de sistemas:
+  1. Repositorio admin actualizado (o paquete comprimido del proyecto)
+  2. Variables de entorno requeridas para admin (.env)
+  3. Opcion A: la carpeta dist/ ya generada
+  4. Opcion B: instrucciones para que ellos hagan el build en servidor
+
+Que hace sistemas para publicarlo (flujo simple recomendado):
+  1. Ubica el proyecto en el servidor
+  2. Crea .env con VITE_API_BASE_URL y VITE_FRONTEND_URL
+  3. Ejecuta npm install
+  4. Ejecuta npm run build (genera dist/)
+  5. Copia dist/ al root del virtual host de admin en Nginx
+  6. Configura try_files para SPA: try_files $uri $uri/ /index.html;
+  7. Recarga Nginx: nginx -t && systemctl reload nginx
+
+Nota importante:
+  El admin SI es interactivo aunque se publique como estatico.
+  El navegador ejecuta JavaScript y consume la API del backend para
+  login, altas, ediciones, cargas de archivos y actualizacion de datos.
+
+================================================================================
+  MONITOREO RECOMENDADO
+================================================================================
+
+  PM2:
+    pm2 status          → estado de todos los procesos
+    pm2 logs            → logs en tiempo real
+    pm2 monit           → CPU y RAM por proceso
+
+  Monitoreo de servidor (usar la herramienta del proveedor elegido):
+    - AWS: CloudWatch (CPUUtilization, CPUCreditBalance, MemoryUtilization)
+    - DigitalOcean: Monitoring integrado en el Droplet
+    - Cualquier proveedor: instalar Netdata, Prometheus+Grafana, o similar
+    Métricas clave: CPU > 70% sostenido, RAM > 80%, disco > 80%
+
+  Logs de Nginx:
+    /var/log/nginx/access.log
+    /var/log/nginx/error.log
+
+  Logs del backend (PM2):
+    /opt/backend/logs/out.log
+    /opt/backend/logs/err.log
+
+================================================================================
+  CHECKLIST DE DESPLIEGUE (SISTEMAS)
+================================================================================
+
+  INFRAESTRUCTURA
+  □ Servidores levantados (EC2, DigitalOcean, Hetzner o cualquier VPS)
+  □ Ubuntu 22.04 LTS instalado (o Linux equivalente)
+  □ Node.js 20.x instalado
+  □ PM2 instalado globalmente
+  □ Nginx instalado y habilitado
+  □ MySQL 8+ disponible (en el mismo servidor, server dedicado, o DBaaS)
+  □ Base de datos creada con charset utf8mb4
+  □ Usuario de BD creado con permisos
+  □ Storage de imágenes decidido y configurado (S3, R2, Spaces, local, etc.)
+  □ Credenciales de storage obtenidas y listas para el .env
+  □ Dominios DNS apuntando a las IPs de los servidores
+  □ Certificados SSL instalados (Certbot o ACM)
+  □ Firewall configurado (solo puertos 80/443/22 expuestos al exterior)
+
+  DESPLIEGUE
+  □ Repositorios clonados en el servidor
+  □ Archivos .env creados con permisos 600 (valores provistos por Javer)
+  □ npm install ejecutado en backend y frontend
+  □ Migraciones ejecutadas: node node_scripts/migrate.js
+  □ Build del frontend: npm run build
+  □ Build del admin: npm run build (dist/ copiado a Nginx)
+  □ PM2 iniciado para backend y frontend
+  □ pm2 save && pm2 startup ejecutados
+  □ Nginx configurado y recargado: nginx -t && systemctl reload nginx
+
+  VALIDACIÓN
+  □ https://api.derex.com responde (endpoint de prueba: GET /estados)
+  □ https://www.derex.com carga el sitio correctamente
+  □ https://admin.derex.com carga el panel admin
+  □ Subida de imagen desde el admin funciona (con el storage elegido)
+  □ Formulario de contacto del sitio envía sin error
+
+================================================================================
+  SERVICIOS EXTERNOS CON COSTO — RESUMEN
+================================================================================
+
+Los siguientes servicios son necesarios para el funcionamiento del sitio
+y algunos tienen costo. Se listan para que Derex los contemple en su
+presupuesto de operación.
+
+  SERVICIO              OBLIGATORIO   COSTO APROX.             RESPONSABLE
+  --------------------  -----------  -----------------------  -----------
+  Servidores (x2)       SI           Depende del proveedor    Sistemas
+  MySQL (BD)            SI           Depende del proveedor    Sistemas
+  Cloudflare R2         SI *         ~$0–$5/mes (uso normal)  Sistemas
+    (* o AWS S3 como alternativa)
+  Google Maps API       SI           ~$0 free tier;           Desarrollo
+                                     cobro si > 28k carg/mes
+  Google reCAPTCHA      SI           Gratuito                 Desarrollo
+  SMTP / Email          SI           Según proveedor email    Desarrollo
+                                     (Office 365 ~$6/usuario/mes)
+  CRM / Salesforce      SI *         Depende del CRM elegido  Negocio
+    (* o el CRM que use Derex; si no tienen, el equipo de desarrollo
+       debe adaptar el código para usar una alternativa)
+  SSL (HTTPS)           SI           Gratuito con Let's Encrypt  Sistemas
+
+  NOTAS:
+  - Google Maps: El free tier cubre $200 USD/mes de uso gratuito
+    (~28,000 cargas de mapa). Un sitio inmobiliario con tráfico normal
+    suele mantenerse en free tier. Requiere tarjeta de crédito registrada.
+  - Cloudflare R2: 10 GB + 1M operaciones/mes gratis. El costo solo
+    sube si el volumen de imágenes o tráfico es muy alto.
+  - Los servidores son el costo más significativo y dependen del
+    proveedor e instancia que elija Derex.
+
+================================================================================
+  CONTACTO PARA VARIABLES Y CONFIGURACIÓN
+================================================================================
+
+  Para obtener los valores de las variables de entorno (.env),
+  coordinar con el equipo de Javer / desarrollo de Derex.
+  Sistemas solo recibe y despliega; el equipo de negocio provee los valores.
+
+================================================================================

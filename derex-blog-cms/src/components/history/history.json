@@ -1,0 +1,27 @@
+{
+  "collectionName": "components_history_histories",
+  "info": {
+    "displayName": "History",
+    "description": "",
+    "icon": "bulletList"
+  },
+  "options": {},
+  "attributes": {
+    "madeBy": {
+      "type": "string",
+      "required": true
+    },
+    "madeAt": {
+      "type": "datetime",
+      "required": true
+    },
+    "action": {
+      "type": "enumeration",
+      "enum": [
+        "crear",
+        "editar",
+        "eliminar"
+      ]
+    }
+  }
+}

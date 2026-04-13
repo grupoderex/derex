@@ -1,0 +1,16 @@
+{
+  "collectionName": "components_blog_images",
+  "info": {
+    "displayName": "Image",
+    "description": "Single image block"
+  },
+  "options": {},
+  "attributes": {
+    "image": {
+      "type": "media",
+      "multiple": false,
+      "required": true,
+      "allowedTypes": ["images", "videos"]
+    }
+  }
+}

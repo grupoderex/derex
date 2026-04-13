@@ -1,0 +1,202 @@
+name: derex
+
+services:
+
+  # ─── Traefik (reverse proxy + TLS) ───────────────────────────────────────────
+  traefik:
+    image: traefik:v3.0
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    command:
+      - "--api.dashboard=false"
+      - "--log.level=INFO"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.websecure.address=:443"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=web"
+      - "--providers.file.directory=/etc/traefik/dynamic"
+      - "--providers.file.watch=true"
+      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/acme/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./traefik/dynamic:/etc/traefik/dynamic:ro
+      - traefik-certs:/acme
+    networks:
+      - web
+
+  # ─── Frontend (Next.js SSR) ───────────────────────────────────────────────────
+  frontend:
+    build:
+      context: ./derex-frontend-main
+      args:
+        NEXT_PUBLIC_REACT_APP_BACKEND_URL: https://api.${DOMAIN}
+        NEXT_PUBLIC_REACT_APP_BLOG_URL: https://blog.${DOMAIN}
+        NEXT_PUBLIC_REACT_APP_GOOGLE_MAPS_KEY: ${NEXT_PUBLIC_REACT_APP_GOOGLE_MAPS_KEY}
+        NEXT_PUBLIC_ENABLE_GOOGLE_MAPS_DEV: ${NEXT_PUBLIC_ENABLE_GOOGLE_MAPS_DEV:-false}
+        SITE_URL: https://${DOMAIN}
+    environment:
+      NEXT_PUBLIC_REACT_APP_GOOGLE_MAPS_KEY: ${NEXT_PUBLIC_REACT_APP_GOOGLE_MAPS_KEY}
+      NEXT_PUBLIC_ENABLE_GOOGLE_MAPS_DEV: ${NEXT_PUBLIC_ENABLE_GOOGLE_MAPS_DEV:-false}
+    restart: always
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      # HTTP → HTTPS redirect
+      - "traefik.http.routers.frontend-http.rule=Host(`${DOMAIN}`) || Host(`www.${DOMAIN}`)"
+      - "traefik.http.routers.frontend-http.entrypoints=web"
+      - "traefik.http.routers.frontend-http.middlewares=https-redirect@file"
+      # HTTPS (handles both apex + www with www→apex redirect)
+      - "traefik.http.routers.frontend.rule=Host(`${DOMAIN}`) || Host(`www.${DOMAIN}`)"
+      - "traefik.http.routers.frontend.entrypoints=websecure"
+      - "traefik.http.routers.frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.frontend.middlewares=www-to-root"
+      - "traefik.http.services.frontend.loadbalancer.server.port=3000"
+      # www → apex redirect middleware
+      - "traefik.http.middlewares.www-to-root.redirectregex.regex=^https://www\\.(.+)"
+      - "traefik.http.middlewares.www-to-root.redirectregex.replacement=https://$$1"
+      - "traefik.http.middlewares.www-to-root.redirectregex.permanent=true"
+
+  # ─── Backend (Express API) ────────────────────────────────────────────────────
+  backend:
+    build:
+      context: ./derex-backend-master
+    restart: always
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DB_HOST: mysql
+      DB_USER: ${MYSQL_USER}
+      DB_PASSWORD: ${MYSQL_PASSWORD}
+      DB_NAME: ${MYSQL_DATABASE}
+      JWT_SECRET: ${JWT_SECRET}
+      EMAIL_USER: ${EMAIL_USER}
+      EMAIL_PASS: ${EMAIL_PASS}
+      EMAIL_ATENCION_CLIENTE_USER: ${EMAIL_ATENCION_CLIENTE_USER}
+      EMAIL_ATENCION_CLIENTE_PASS: ${EMAIL_ATENCION_CLIENTE_PASS}
+      EMAIL_PROXIMOS_LANZAMIENTOS_USER: ${EMAIL_PROXIMOS_LANZAMIENTOS_USER}
+      EMAIL_PROXIMOS_LANZAMIENTOS_PASS: ${EMAIL_PROXIMOS_LANZAMIENTOS_PASS}
+      SALESFORCE_URL_PREFIX: ${SALESFORCE_URL_PREFIX}
+      SALESFORCE_ORG_ID: ${SALESFORCE_ORG_ID}
+      RECAPTCHA_SECRET_KEY: ${RECAPTCHA_SECRET_KEY}
+      RECAPTCHA_BYPASS: ${RECAPTCHA_BYPASS:-false}
+    networks:
+      - web
+      - internal
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - backend-uploads:/app/uploads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend-http.rule=Host(`api.${DOMAIN}`)"
+      - "traefik.http.routers.backend-http.entrypoints=web"
+      - "traefik.http.routers.backend-http.middlewares=https-redirect@file"
+      - "traefik.http.routers.backend.rule=Host(`api.${DOMAIN}`)"
+      - "traefik.http.routers.backend.entrypoints=websecure"
+      - "traefik.http.routers.backend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.backend.loadbalancer.server.port=3000"
+
+  # ─── Admin (React SPA + NGINX) ────────────────────────────────────────────────
+  admin:
+    build:
+      context: ./derex-admin-new-main
+      args:
+        VITE_API_BASE_URL: https://api.${DOMAIN}
+        VITE_FRONTEND_URL: https://${DOMAIN}
+    restart: always
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.admin-http.rule=Host(`admin.${DOMAIN}`)"
+      - "traefik.http.routers.admin-http.entrypoints=web"
+      - "traefik.http.routers.admin-http.middlewares=https-redirect@file"
+      - "traefik.http.routers.admin.rule=Host(`admin.${DOMAIN}`)"
+      - "traefik.http.routers.admin.entrypoints=websecure"
+      - "traefik.http.routers.admin.tls.certresolver=letsencrypt"
+      - "traefik.http.services.admin.loadbalancer.server.port=80"
+
+  # ─── Blog (Strapi CMS) ────────────────────────────────────────────────────────
+  blog:
+    build:
+      context: ./derex-blog-cms
+    restart: always
+    environment:
+      NODE_ENV: production
+      HOST: 0.0.0.0
+      PORT: 1337
+      APP_KEYS: ${STRAPI_APP_KEYS}
+      API_TOKEN_SALT: ${STRAPI_API_TOKEN_SALT}
+      ADMIN_JWT_SECRET: ${STRAPI_ADMIN_JWT_SECRET}
+      TRANSFER_TOKEN_SALT: ${STRAPI_TRANSFER_TOKEN_SALT}
+      JWT_SECRET: ${STRAPI_JWT_SECRET}
+      STRAPI_BOOTSTRAP_ADMIN_FIRSTNAME: ${STRAPI_BOOTSTRAP_ADMIN_FIRSTNAME}
+      STRAPI_BOOTSTRAP_ADMIN_LASTNAME: ${STRAPI_BOOTSTRAP_ADMIN_LASTNAME}
+      STRAPI_BOOTSTRAP_ADMIN_EMAIL: ${STRAPI_BOOTSTRAP_ADMIN_EMAIL}
+      STRAPI_BOOTSTRAP_ADMIN_PASSWORD: ${STRAPI_BOOTSTRAP_ADMIN_PASSWORD}
+      STRAPI_BOOTSTRAP_ADMIN_ONETIME: ${STRAPI_BOOTSTRAP_ADMIN_ONETIME:-false}
+      DATABASE_CLIENT: mysql
+      DATABASE_HOST: mysql
+      DATABASE_PORT: 3306
+      DATABASE_NAME: ${MYSQL_STRAPI_DATABASE}
+      DATABASE_USERNAME: ${MYSQL_USER}
+      DATABASE_PASSWORD: ${MYSQL_PASSWORD}
+      DATABASE_SSL: "false"
+    networks:
+      - web
+      - internal
+    depends_on:
+      mysql:
+        condition: service_healthy
+    volumes:
+      - strapi-uploads:/opt/app/public/uploads
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.blog-http.rule=Host(`blog.${DOMAIN}`)"
+      - "traefik.http.routers.blog-http.entrypoints=web"
+      - "traefik.http.routers.blog-http.middlewares=https-redirect@file"
+      - "traefik.http.routers.blog.rule=Host(`blog.${DOMAIN}`)"
+      - "traefik.http.routers.blog.entrypoints=websecure"
+      - "traefik.http.routers.blog.tls.certresolver=letsencrypt"
+      - "traefik.http.services.blog.loadbalancer.server.port=1337"
+
+  # ─── MySQL ────────────────────────────────────────────────────────────────────
+  mysql:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./mysql/init:/docker-entrypoint-initdb.d:ro
+    networks:
+      - internal
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+# ─── Named volumes ────────────────────────────────────────────────────────────
+volumes:
+  mysql-data:
+  traefik-certs:
+  strapi-uploads:
+  backend-uploads:
+
+    # ─── Networks ─────────────────────────────────────────────────────────────────
+networks:
+  web:
+  internal:
+    internal: true # MySQL cannot reach the internet; services on both networks can

@@ -1,0 +1,260 @@
+.contacto-outer {
+  color: var(--main-grey);
+  display: flex;
+  flex-direction: column;
+  justify-items: center;
+  align-items: center;
+  width: 40em;
+  min-height: calc(100vh - 4rem);
+  margin: 0 auto;
+}
+
+.contacto-title {
+  margin: 1.2rem 0;
+  text-align: center;
+}
+
+.contacto-title > h1 {
+  font-size: 2.5rem;
+  color: var(--main-red);
+  font-family: "Viga";
+  margin: 0;
+  padding: 0;
+}
+
+.contacto-title > h2 {
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  align-self: stretch;
+  justify-content: space-evenly;
+}
+
+.contacto-form > sub {
+  /* background-color: red; */
+  align-self: stretch;
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+  /* color: var(--lightest-grey); */
+}
+
+.contacto-form {
+  margin: auto 0;
+  display: flex;
+  flex-direction: column;
+  width: 40em;
+  opacity: 0;
+  /* TODO make this animation for all */
+  animation-duration: 0.5s;
+  animation-delay: 0.5s;
+  animation-name: cform-in;
+  animation-fill-mode: forwards;
+}
+
+@keyframes cform-in {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 100;
+  }
+}
+
+.contacto-row {
+  display: flex;
+  flex-grow: 1;
+  flex-basis: 0;
+  margin-top: 1em;
+  font-size: 0.8rem;
+}
+
+.cor2 {
+  padding: 0.5em 0;
+}
+
+.cor2 > div {
+  display: flex;
+  flex-grow: 1;
+  margin-left: 1em;
+}
+
+.contacto-input-col {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+  width: 50%;
+  align-self: stretch;
+}
+
+.contacto-input-col > label {
+  text-transform: uppercase;
+  flex-grow: 1;
+  /* margin: 0.5em; */
+  margin-top: 0;
+  margin-bottom: 0.5em;
+}
+
+.contacto-input-col > input {
+  flex-grow: 1;
+  background-color: var(--lightest-grey);
+  outline: none;
+  border: none;
+  border-radius: 0.25em;
+  padding: 0.5em;
+  font-size: 1rem;
+  color: var(--main-black);
+  /* font-family: "Roboto"; */
+}
+
+.contacto-input-col > input:disabled {
+  color: var(--main-grey);
+}
+
+.contacto-input-col > textarea {
+  flex-grow: 1;
+  margin: 0.5em 0;
+  background-color: var(--lightest-grey);
+  color: var(--main-black);
+  outline: none;
+  border: none;
+  border-radius: 0.25em;
+  padding: 0.5em;
+  /* font-family: "Roboto"; */
+  height: 10em;
+  resize: none;
+}
+
+.contacto-input-col:nth-of-type(1) {
+  margin-right: 0.25em;
+}
+.contacto-input-col:nth-of-type(2) {
+  margin-left: 0.25em;
+}
+
+.contacto-col {
+  flex-grow: 1;
+  flex-basis: 0;
+  justify-content: flex-end;
+  align-items: center;
+  display: flex;
+}
+
+@media (max-width: 1000px) {
+  .contacto-outer > h2 {
+    font-size: 0.73rem;
+  }
+  .contacto-outer {
+    width: 80%;
+  }
+  .contacto-form {
+    width: 100%;
+  }
+  .contacto-row {
+    flex-direction: column;
+  }
+  .contacto-input-col {
+    margin-left: 0;
+    margin-right: 0;
+  }
+  .contacto-input-col:nth-of-type(2) {
+    /* background-color: green; */
+    margin-top: 0.75em;
+  }
+
+  .contacto-input-col {
+    width: 100%;
+  }
+
+  .cor2 {
+    flex-direction: row;
+  }
+}
+
+.form-select-dropdown {
+  cursor: pointer;
+  flex-grow: 1;
+  color: var(--main-black);
+  font-size: 1rem;
+  background-color: var(--lightest-grey);
+  outline: none;
+  border: none;
+  padding: 0.5rem 0.46rem;
+  height: 2.5rem;
+  border-radius: 0.25em;
+  /* font-family: "Roboto"; */
+  position: relative;
+  margin-bottom: 0 !important;
+  transition: all 0.25s ease;
+}
+
+.form-select-dropdown.placeholder {
+  color: var(--main-grey);
+}
+
+.dropdown {
+  position: absolute;
+  background-color: #fff;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+  border-radius: 0.25em;
+  padding: 0.5rem;
+  z-index: 1;
+  top: 2.5rem;
+  left: 0;
+  width: 100%;
+  max-height: 250px;
+  overflow-y: scroll;
+  box-sizing: border-box;
+}
+
+.dropdown-item {
+  padding: 0.5rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  border-bottom: 1px solid var(--lightest-grey);
+  border-radius: 0.25rem;
+  transition: all 0.25s ease;
+}
+
+.dropdown-item:last-child {
+  border-bottom: none;
+}
+
+.dropdown-item:hover,
+.dropdown-item.active {
+  color: #fff;
+  background-color: var(--main-red);
+}
+
+.enviar-button {
+  background-color: var(--main-red);
+  color: #fff;
+  cursor: pointer;
+  padding: 1em 0;
+  border: none;
+  border-radius: 0.25em;
+  outline: none;
+  margin: 1rem 0 1rem auto;
+  width: 10em;
+  transition: all 1s;
+}
+
+.enviar-button:disabled {
+  background-color: #ccc;
+  color: #888;
+}
+
+.lotes-row-info {
+  display: flex;
+  flex-direction: column;
+  margin: 2rem 0;
+}
+
+.lotes-row-info > p {
+  margin-bottom: 1rem;
+  text-align: center;
+  font-size: 0.75rem;
+}
+
+.lotes-row-info > p > span {
+  color: var(--main-red);
+  font-weight: 600;
+}

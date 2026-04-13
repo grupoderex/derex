@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_blog_carousels",
+  "info": {
+    "displayName": "Carousel",
+    "description": "Carousel media block"
+  },
+  "options": {},
+  "attributes": {
+    "media": {
+      "type": "media",
+      "multiple": true,
+      "required": true,
+      "allowedTypes": [
+        "images"
+      ]
+    }
+  }
+}

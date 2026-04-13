@@ -1,0 +1,138 @@
+# ═════════════════════════════════════════════════════════════════════════════
+# Environment Variables - NEVER commit sensitive data
+# ═════════════════════════════════════════════════════════════════════════════
+.env
+.env.local
+.env.*.local
+.env.qa
+.env.prod
+.env.staging
+
+# ALLOWED: .env.example files (safe templates)
+!.env.example
+!**/.env.example
+
+# ═════════════════════════════════════════════════════════════════════════════
+# Node.js / npm / yarn
+# ═════════════════════════════════════════════════════════════════════════════
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+.pnp
+.pnp.js
+
+# ═════════════════════════════════════════════════════════════════════════════
+# Build Output - Next.js, Vite, etc.
+# ═════════════════════════════════════════════════════════════════════════════
+dist/
+build/
+.next/
+out/
+.nuxt/
+.cache/
+.vuepress/dist/
+.serverless/
+.fusebox/
+.dynamodb/
+.tern-port
+
+# ═════════════════════════════════════════════════════════════════════════════
+# IDE / Editor Files
+# ═════════════════════════════════════════════════════════════════════════════
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+*.sublime-project
+*.sublime-workspace
+.env.*.swp
+
+# ═════════════════════════════════════════════════════════════════════════════
+# OS Files
+# ═════════════════════════════════════════════════════════════════════════════
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+
+# ═════════════════════════════════════════════════════════════════════════════
+# Logs and Backups
+# ═════════════════════════════════════════════════════════════════════════════
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+*.bak
+*.tmp
+
+# ═════════════════════════════════════════════════════════════════════════════
+# Docker
+# ═════════════════════════════════════════════════════════════════════════════
+.docker-compose.local.override.yml
+docker-volumes/
+mysql-data/
+
+# ═════════════════════════════════════════════════════════════════════════════
+# Backend & API
+# ═════════════════════════════════════════════════════════════════════════════
+derex-backend-master/uploads/
+derex-backend-master/dist/
+derex-backend-master/.env
+derex-backend-master/.env.local
+derex-backend-master/node_scripts/node_modules/
+
+# ═════════════════════════════════════════════════════════════════════════════
+# Frontend & Admin
+# ═════════════════════════════════════════════════════════════════════════════
+derex-frontend-main/.next/
+derex-frontend-main/out/
+derex-frontend-main/.env.local
+derex-admin-new-main/.env
+derex-admin-new-main/.env.local
+derex-admin-new-main/dist/
+
+# ═════════════════════════════════════════════════════════════════════════════
+# Blog / CMS
+# ═════════════════════════════════════════════════════════════════════════════
+derex-blog-cms/.env
+derex-blog-cms/.env.local
+derex-blog-cms/dist/
+derex-blog-cms/.cache/
+
+# ═════════════════════════════════════════════════════════════════════════════
+# Development / Temp
+# ═════════════════════════════════════════════════════════════════════════════
+.turbo/
+.eslintcache
+.vscode-test
+.vscode settings
+coverage/
+*.coverage
+lcov-report/
+html/
+
+# ═════════════════════════════════════════════════════════════════════════════
+# SSL Certificates (if used locally)
+# ═════════════════════════════════════════════════════════════════════════════
+*.pem
+*.key
+*.crt
+*.cert
+
+# ═════════════════════════════════════════════════════════════════════════════
+# Keep these important files
+# ═════════════════════════════════════════════════════════════════════════════
+!.gitkeep
+!.env.example
+!**/.env.example

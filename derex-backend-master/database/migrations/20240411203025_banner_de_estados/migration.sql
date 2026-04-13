@@ -1,0 +1,1 @@
+ALTER TABLE `state` ADD COLUMN `banner_url` TEXT NULL;

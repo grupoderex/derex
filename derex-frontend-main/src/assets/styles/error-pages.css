@@ -1,0 +1,57 @@
+.error-page {
+  min-height: 100vh;
+  width: 100%;
+  justify-content: center;
+  align-content: center;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  padding: 2rem;
+}
+
+.error-title {
+  color: var(--main-black);
+  font-size: 64px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: normal;
+}
+
+.error-description {
+  margin-top: 1rem;
+  color: var(--main-black);
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: normal;
+}
+
+.error-img {
+  width: 80vw;
+  max-width: 600px;
+  height: auto;
+  margin: 5rem auto;
+}
+
+.error-home-button {
+  cursor: pointer;
+  border-bottom: 2px solid var(--main-black);
+  margin: 0 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 0.15rem 0.5rem;
+}
+
+.error-home-button > p {
+  color: var(--main-black);
+  font-size: 1.5rem;
+  font-weight: 400;
+  text-transform: capitalize;
+}
+
+.error-home-button > svg {
+  height: 1.5rem;
+  width: 1.5rem;
+  margin-right: 0.5rem;
+}

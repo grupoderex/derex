@@ -1,0 +1,55 @@
+name: ec2-deploy-dev
+# Trigger deployment only on push to master branch
+on:
+  push:
+    branches:
+      - develop
+jobs:
+  deploy:
+    name: Deploy to EC2 on develop branch push (DEV)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the files
+        uses: actions/checkout@v4
+
+      - name: Deploy to Server 1
+        uses: easingthemes/ssh-deploy@main
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY_DEV }}
+          REMOTE_HOST: ${{ secrets.HOST_DNS_DEV }}
+          REMOTE_USER: ${{ secrets.USERNAME_DEV }}
+          REACT_APP_BACKEND_URL: ${{ secrets.VITE_API_BASE_URL_DEV }}
+          REACT_APP_GOOGLE_MAPS_KEY: ${{ secrets.VITE_KEY_GOOGLE_MAPS }}
+          REACT_APP_S3_URL: ${{ secrets.VITE_S3_URL_DEV }}
+
+      - name: Executing remote ssh commands using ssh key
+        uses: appleboy/ssh-action@master
+        env:
+          REACT_APP_BACKEND_URL: ${{ secrets.VITE_API_BASE_URL_DEV }}
+          REACT_APP_GOOGLE_MAPS_KEY: ${{ secrets.VITE_KEY_GOOGLE_MAPS }}
+          REACT_APP_S3_URL: ${{ secrets.VITE_S3_URL_DEV }}
+        with:
+          envs: REACT_APP_BACKEND_URL, REACT_APP_GOOGLE_MAPS_KEY, REACT_APP_S3_URL
+          host: ${{ secrets.HOST_DNS_DEV }}
+          username: ${{ secrets.USERNAME_DEV }}
+          key: ${{ secrets.EC2_SSH_KEY_DEV }}
+          script: |
+            export NVM_DIR="$HOME/.nvm"
+            [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+            [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+            nvm use 20
+            npm install
+            npm run build
+            sudo rm -rf /var/www/html/javer-frontend/
+            sudo cp -r build/ /var/www/html/javer-frontend
+
+  #slackNotification:
+  #  needs: [deploy]
+  #  name: Slack Notification
+  #  runs-on: ubuntu-latest
+  #  steps:
+  #    - uses: actions/checkout@v4
+  #    - name: Slack Notification
+  #      uses: rtCamp/action-slack-notify@v2
+  #      env:
+  #        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}

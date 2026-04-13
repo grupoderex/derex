@@ -1,0 +1,317 @@
+================================================================================
+  GUÍA DE SINCRONIZACIÓN: PRODUCCIÓN → LOCAL (javer_db)
+  Fecha: Marzo 2026
+================================================================================
+
+BASE DE DATOS LOCAL
+  Host:     127.0.0.1:3306
+  DB:       javer_db
+  Usuario:  root / @Tecmilenio2025
+
+BACKEND LOCAL (puerto 3000)
+  http://localhost:3000
+
+URL DE PRODUCCIÓN / PREPROD
+  https://preprod-api.javer.com.mx
+
+MAPEO CONFIRMADO
+  LOCAL id=4  (Amairé)               → PROD id=???
+  LOCAL id=5  (Pilares la Puerta)    → PROD id=122  ✅ COMPLETADO
+  LOCAL id=7  (Valle de los Encinos) → PROD id=165  ✅ COMPLETADO
+  LOCAL id=9  (Privada Cantabria)    → PROD id=123  ✅ COMPLETADO
+  LOCAL id=10 (Valle Condesa Sector Francés) → PROD id=124  ✅ COMPLETADO
+  LOCAL id=12 (Valle Condesa Sector Irlandés) → PROD id=153  ✅ COMPLETADO
+  LOCAL id=13 (Bosques de la Sierra) → PROD id=152  ✅ COMPLETADO
+  LOCAL id=14 (Misión de los Ángeles) → PROD id=111  ✅ COMPLETADO
+  LOCAL id=15 (Valle de Santa Elena Sector San José) → PROD id=160  ✅ COMPLETADO
+  LOCAL id=16 (Lomas del Mirador)     → PROD id=148  ✅ COMPLETADO
+  LOCAL id=17 (Xandora Residencial)   → PROD id=151  ✅ COMPLETADO
+  LOCAL id=18 (El Jaral)              → PROD id=156  ✅ COMPLETADO
+  LOCAL id=19 (Privada Monte Carmelo) → PROD id=157  ✅ COMPLETADO
+  LOCAL id=20 (Paseos del Sur)         → PROD id=7    ✅ COMPLETADO
+  LOCAL id=22 (Privada Zekkei)        → PROD id=121  ✅ COMPLETADO
+  LOCAL id=24 (Privada Zekkei II)     → PROD id=139  ✅ COMPLETADO
+  LOCAL id=26 (Caranday II Sector Creta) → PROD id=159  ✅ COMPLETADO
+  LOCAL id=27 (Allegro Residencial)   → PROD id=166  ✅ COMPLETADO
+  LOCAL id=28 (Vista Serena)          → PROD id=155  ✅ COMPLETADO
+  LOCAL id=29 (Fioré)                 → PROD id=117  ✅ COMPLETADO
+  LOCAL id=30 (Vistas del Nevado)      → PROD id=162  ✅ COMPLETADO
+  LOCAL id=31 (Valle de los Cedros)    → PROD id=143  ✅ COMPLETADO
+  LOCAL id=32 (Brisas del Valle)       → PROD id=158  ✅ COMPLETADO
+  LOCAL id=33 (Privada Belporto)       → PROD id=142  ✅ COMPLETADO
+  LOCAL id=25 (Caranday II Sector Betel) → PROD id=140  ✅ COMPLETADO
+  LOCAL id=34 (Paseo de los Agaves)       → PROD id=146  ⚠️ PARCIAL
+  LOCAL id=36 (Valle de Tejeda)           → PROD id=14   ✅ COMPLETADO
+  LOCAL id=37 (Beltura)                   → PROD id=135  ✅ COMPLETADO
+  LOCAL id=38 (Mirador de los Encinos)    → PROD id=149  ✅ COMPLETADO
+  LOCAL id=39 (Arbore)                    → PROD id=120  ✅ COMPLETADO
+  LOCAL id=40 (Marqués del Río)           → PROD id=133  ✅ COMPLETADO
+  LOCAL id=41 (Valvento)                  → PROD id=154  ✅ COMPLETADO
+  LOCAL id=42 (Privalia Ambienta)         → PROD id=37   ✅ COMPLETADO
+  LOCAL id=43 (Massaro Residencial)       → PROD id=34   ✅ COMPLETADO
+  LOCAL id=44 (Cumbre Mezquite)           → PROD id=163  ✅ COMPLETADO
+  LOCAL id=45 (Portoalto)                 → PROD id=41   ✅ COMPLETADO
+  LOCAL id=49 (Altai Residencial)         → PROD id=144  ✅ COMPLETADO
+  LOCAL id=50 (Real Valencia)             → PROD id=164  ✅ COMPLETADO
+  LOCAL id=51 (Pirámides)                 → PROD id=45   ✅ COMPLETADO
+
+================================================================================
+  DATOS A REVISAR POR PROYECTO (checklist)
+================================================================================
+
+Para cada proyecto necesitas obtener y sincronizar:
+
+  [P] Propiedades activas          → tabla: property
+  [PR] Precios de propiedades      → tabla: prices_list_property
+  [I]  Imágenes de propiedades     → tabla: project_property_images
+  [PL] Planos / blueprints         → tabla: project_property_blueprints
+  [AT] Amenidades TEXTO            → tabla: amenity_property (name IS NOT NULL)
+  [AI] Amenidades IMAGEN           → tabla: amenity_property (name IS NULL)
+  [C]  Tipos de crédito            → tabla: project_credits
+  [PR] Promoción activa            → tabla: project_promotions
+  [ED] Certificación EDGE          → campo: property.isEdgeCertified=1
+
+================================================================================
+  ENDPOINTS DE PRODUCCIÓN A CONSULTAR
+================================================================================
+
+Reemplaza https://preprod-api.javer.com.mx con la base URL y [PROD_ID] con el id del proyecto en prod.
+
+1. PROYECTO COMPLETO (incluye credit_types, hasPropertyWithEdgeCertification)
+  GET https://preprod-api.javer.com.mx/proyectos/id/[PROD_ID]
+
+2. PROPIEDADES del proyecto (lista con precios base)
+  GET https://preprod-api.javer.com.mx/propiedades/properties_search?project=[PROD_ID]
+
+3. PROPIEDAD INDIVIDUAL completa (con blueprints, imágenes, precios)
+  GET https://preprod-api.javer.com.mx/propiedades/id/[PROP_ID]
+
+4. AMENIDADES TEXTO del proyecto
+  GET https://preprod-api.javer.com.mx/amenidades/get_all/[PROD_ID]
+   → Filtrar los que tienen "name" (texto), campo label/icon
+
+5. AMENIDADES IMAGEN del proyecto
+  GET https://preprod-api.javer.com.mx/amenidades/get_all/[PROD_ID]
+   → Filtrar los que tienen "name" = null (solo imagen/url)
+
+6. PROMOCIONES del proyecto
+  GET https://preprod-api.javer.com.mx/project-promotions/get-by-project/[PROD_ID]
+
+7. TIPOS DE CRÉDITO disponibles (catálogo global)
+  GET https://preprod-api.javer.com.mx/cat-credit-type/get-by-filters
+
+8. IMÁGENES de propiedad (si no vienen en /propiedades/id/:id)
+  GET https://preprod-api.javer.com.mx/imagenes-propiedades/get-by-property/[PROP_ID]
+
+9. PLANOS / BLUEPRINTS de propiedad
+  GET https://preprod-api.javer.com.mx/planos/get-by-property/[PROP_ID]
+
+10. PRECIOS de propiedad
+    GET https://preprod-api.javer.com.mx/precios/get-by-property/[PROP_ID]
+
+11. TÍTULOS DE SECCIONES DEL PROYECTO (meta CMS)
+  GET https://preprod-api.javer.com.mx/meta/project_[PROD_ID]
+  → En local se debe guardar como section=project_[LOCAL_ID] en tabla meta
+
+================================================================================
+  ESTADO ACTUAL DE TODOS LOS PROYECTOS LOCALES
+================================================================================
+
+Leyenda columnas: P=Propiedades | AT=Amen.Texto | AI=Amen.Imagen | C=Créditos | PR=Promo | ED=Edge
+(número = cantidad de registros, ✅ = tiene datos, ❌ = vacío)
+
+ID  | NOMBRE                               | CIUDAD                   | ESTADO           |  P | AT | AI |  C | PR | ED
+----|--------------------------------------|--------------------------|------------------|----|----|----|----|----|----|
+ 1  | Cumbre del Valle                     | Monterrey                | Nuevo León       |  2 |  0 |  0 |  0 |  0 |  0
+ 2  | Villas del Norte                     | Escobedo                 | Sin Estado       |  1 |  0 |  0 |  0 |  0 |  0
+ 3  | Bosques del Sur                      | Guadalajara              | Jalisco          |  1 |  0 |  0 |  0 |  0 |  0
+ 4  | Amairé                               | Monterrey                | Nuevo León       |  4 | 16 | 13 |  3 |  1 |  0  ← parcial
+ 5  | Pilares la Puerta                    | Salinas Victoria         | Nuevo León       |  1 |  6 |  5 |  6 |  1 |  1  ✅ COMPLETADO (PROD=122)
+ 6  | Cumbre del Norte                     | Salinas Victoria         | Nuevo León       |  0 |  0 |  0 |  0 |  0 |  0
+ 7  | Valle de los Encinos                 | Salinas Victoria         | Nuevo León       |  2 |  0 |  5 |  7 |  1 |  0  ✅ COMPLETADO (PROD=165)
+ 8  | PRIVADA BELTERRA                     | Juárez                   | Nuevo León       |  0 |  0 |  0 |  0 |  0 |  0
+ 9  | Privada Cantabria                    | Juárez                   | Nuevo León       |  1 |  9 |  4 |  7 |  1 |  1  ✅ COMPLETADO (PROD=123)
+10  | Valle Condesa Sector Francés         | Juárez                   | Nuevo León       |  2 | 11 |  9 |  7 |  1 |  2  ✅ COMPLETADO (PROD=124)
+11  | Valle Santa Isabel                   | Juárez                   | Nuevo León       |  0 |  0 |  0 |  0 |  0 |  0
+12  | Valle Condesa Sector Irlandés        | Juárez                   | Nuevo León       |  1 | 11 |  7 |  6 |  1 |  1  ✅ COMPLETADO (PROD=153)
+13  | Bosques de la Sierra                 | Santa Catarina           | Nuevo León       |  2 | 10 |  8 |  4 |  1 |  2  ✅ COMPLETADO (PROD=152)
+14  | Misión de los Ángeles                | Apodaca                  | Nuevo León       |  1 | 10 |  9 |  8 |  1 |  1  ✅ COMPLETADO (PROD=111)
+15  | Valle de Santa Elena Sector San José | General Zuazua           | Nuevo León       |  1 |  8 |  4 |  7 |  1 |  1  ✅ COMPLETADO (PROD=160)
+16  | Lomas del Mirador                    | Pesquería                | Nuevo León       |  2 |  8 |  5 |  6 |  1 |  2  ✅ COMPLETADO (PROD=148)
+17  | Xandora Residencial                  | Dominio Cumbres          | Nuevo León       |  1 | 16 |  8 |  4 |  1 |  1  ✅ COMPLETADO (PROD=151)
+18  | El Jaral                             | El Carmen                | Nuevo León       |  1 |  4 |  4 |  5 |  1 |  0  ✅ COMPLETADO (PROD=156)
+19  | Privada Monte Carmelo                | El Carmen                | Nuevo León       |  1 |  3 |  6 |  5 |  1 |  0  ✅ COMPLETADO (PROD=157)
+20  | Paseos del Sur                       | Aguascalientes           | Aguascalientes   |  3 |  5 |  5 |  8 |  1 |  0  ✅ COMPLETADO (PROD=7)
+21  | Vista montaña                        | Aguascalientes           | Aguascalientes   |  0 |  0 |  0 |  0 |  0 |  0
+22  | Privada Zekkei                       | Aguascalientes           | Aguascalientes   |  1 | 14 |  6 |  8 |  1 |  1  ✅ COMPLETADO (PROD=121)
+23  | Betel                                | Aguascalientes           | Aguascalientes   |  0 |  0 |  0 |  0 |  0 |  0
+24  | Privada Zekkei II                    | Aguascalientes           | Aguascalientes   |  1 | 16 |  7 |  8 |  1 |  0  ✅ COMPLETADO (PROD=139)
+25  | Caranday II Sector Betel             | Aguascalientes           | Aguascalientes   |  2 | 16 |  7 |  4 |  1 |  2  ✅ COMPLETADO (PROD=140)
+26  | Caranday II Sector Creta             | Aguascalientes           | Aguascalientes   |  2 | 18 |  8 |  8 |  1 |  0  ✅ COMPLETADO (PROD=159)
+27  | Allegro Residencial                 | Aguascalientes           | Aguascalientes   |  2 | 10 |  5 |  9 |  1 |  0  ✅ COMPLETADO (PROD=166)
+28  | Vista Serena                         | San Francisco de los Romo| Aguascalientes   |  4 | 11 |  5 |  6 |  1 |  4  ✅ COMPLETADO (PROD=155)
+29  | Fioré                                | Tlalnepantla             | Estado De México |  4 | 15 | 11 |  4 |  1 |  0  ✅ COMPLETADO (PROD=117)
+30  | Vistas del Nevado                    | Zinacantepec             | Estado De México |  3 |  7 |  0 |  7 |  1 |  0  ✅ COMPLETADO (PROD=162)
+31  | Valle de los Cedros                  | Zumpango                 | Estado De México |  2 |  9 |  5 |  6 |  1 |  2  ✅ COMPLETADO (PROD=143)
+32  | Brisas del Valle                     | Zumpango                 | Estado De México |  2 | 10 |  7 |  6 |  1 |  0  ✅ COMPLETADO (PROD=158)
+33  | Privada Belporto                     | Cuautitlán Izcalli       | Estado De México |  2 |  7 |  6 |  4 |  1 |  0  ✅ COMPLETADO (PROD=142)
+34  | Paseo de los Agaves                  | Acolman                  | Estado De México |  1 |  3 |  8 |  7 |  1 |  1  ← parcial (PROD=146)
+35  | Alberí Residencial                   | Tlajomulco de Zuñiga     | Jalisco          |  0 |  0 |  0 |  0 |  0 |  0
+36  | Valle de Tejeda                      | Tlajomulco de Zuñiga     | Jalisco          |  1 |  7 |  5 |  9 |  1 |  0  ✅ COMPLETADO (PROD=14)
+37  | Beltura                              | Tlajomulco de Zuñiga     | Jalisco          |  2 | 11 |  7 | 10 |  1 |  2  ✅ COMPLETADO (PROD=135)
+38  | Mirador de los Encinos               | Tlajomulco de Zuñiga     | Jalisco          |  3 | 13 |  7 | 10 |  1 |  0  ✅ COMPLETADO (PROD=149)
+39  | Arbore                               | Zona Bosques Santa Anita | Jalisco          |  2 | 13 | 11 |  6 |  1 |  2  ✅ COMPLETADO (PROD=120)
+40  | Marqués del Río                      | El Marqués               | Querétaro        |  2 |  7 |  7 |  5 |  1 |  2  ✅ COMPLETADO (PROD=133)
+41  | Valvento                             | El Marqués               | Querétaro        |  2 |  6 |  4 |  7 |  1 |  2  ✅ COMPLETADO (PROD=154)
+42  | Privalia Ambienta                    | Querétaro                | Querétaro        |  2 | 12 |  8 |  3 |  0 |  0  ✅ COMPLETADO (PROD=37)
+43  | Massaro Residencial                  | Zibatá                   | Querétaro        |  1 |  8 |  4 |  3 |  1 |  1  ✅ COMPLETADO (PROD=34)
+44  | Cumbre Mezquite                      | Zakia                    | Querétaro        |  3 | 10 |  5 |  3 |  1 |  3  ✅ COMPLETADO (PROD=163)
+45  | Portoalto                            | Playa del Carmen         | Quintana Roo     |  4 | 15 |  7 |  7 |  1 |  0  ✅ COMPLETADO (PROD=41)
+46  | PUNTA ESTRELLA                       | Playa del Carmen         | Quintana Roo     |  0 |  0 |  0 |  0 |  0 |  0
+47  | Arbolada                             | Cancún                   | Quintana Roo     |  0 |  0 |  0 |  0 |  0 |  0
+48  | Privada Altus II                     | Cancún                   | Quintana Roo     |  0 |  0 |  0 |  0 |  0 |  0
+49  | Altai Residencial                    | Cancún                   | Quintana Roo     |  1 | 15 | 13 |  4 |  1 |  0  ✅ COMPLETADO (PROD=144)
+50  | Real Valencia                        | Cancún                   | Quintana Roo     |  3 |  7 |  8 |  3 |  1 |  3  ✅ COMPLETADO (PROD=164)
+51  | Pirámides                            | Reynosa                  | Tamaulipas       |  1 |  9 |  4 |  2 |  1 |  0  ✅ COMPLETADO (PROD=45)
+
+================================================================================
+  FLUJO DE TRABAJO (el mismo que usamos con Caranday id=25)
+================================================================================
+
+PASO 1 — Encuentra el ID de producción del proyecto
+  Opción A: Busca en producción por slug/nombre
+    GET https://preprod-api.javer.com.mx/proyectos/id/[intentar IDs hasta encontrar el match]
+  Opción B: Haz GET https://preprod-api.javer.com.mx/location/location_hierarchy y busca en el JSON
+            por short_name del proyecto que coincida con la tabla de arriba.
+
+PASO 2 — Obtén los datos de producción
+  Ejecuta los endpoints de la sección anterior en orden:
+  1. GET /proyectos/id/[PROD_ID]         → guarda el JSON completo
+  2. GET /propiedades/properties_search?project=[PROD_ID]  → lista propiedades
+  3. Por cada propiedad:
+     GET /propiedades/id/[PROP_ID]       → detalles completos
+  4. GET /amenidades/get_all/[PROD_ID]   → amenidades texto e imagen
+  5. GET /project-promotions/get-by-project/[PROD_ID]  → promoción
+
+PASO 3 — Inserta en local (siempre sustituir PROD_ID → LOCAL_ID)
+  REGLA CRÍTICA: Cambiar id_project/project_id de PROD a LOCAL en todos los INSERTs
+
+  A) PROPIEDADES + PRECIOS:
+  INSERT INTO property (id, id_project, name, active, isEdgeCertified, ...)
+  VALUES (prod_id, LOCAL_ID, ...) ON DUPLICATE KEY UPDATE ...;
+
+  INSERT INTO prices_list_property (id, id_property, name, price_base, ...)
+  VALUES (...) ON DUPLICATE KEY UPDATE ...;
+
+  B) IMÁGENES DE PROPIEDAD (IMPORTANTE: incluir created_at=NOW(), update_at=NOW()):
+  INSERT INTO project_property_images
+    (id, id_property, id_project, url, order_num, created_at, update_at)
+  VALUES (...)
+  ON DUPLICATE KEY UPDATE url=VALUES(url), update_at=NOW();
+
+  C) BLUEPRINTS / PLANOS:
+  INSERT INTO project_property_blueprints (id, id_property, url, name, ...)
+  VALUES (...) ON DUPLICATE KEY UPDATE ...;
+
+  D) AMENIDADES TEXTO (name IS NOT NULL):
+  INSERT INTO amenity_property (id, id_project, name, icon, active)
+  VALUES (...) ON DUPLICATE KEY UPDATE name=VALUES(name), icon=VALUES(icon);
+
+  E) AMENIDADES IMAGEN (name IS NULL):
+  INSERT INTO amenity_property (id, id_project, name, url_image, active)
+  VALUES (id, LOCAL_ID, NULL, url, 1) ON DUPLICATE KEY UPDATE url_image=VALUES(url_image);
+
+  F) TIPOS DE CRÉDITO:
+  -- Primero consulta los IDs en: GET /cat-credit-type/get-by-filters
+  INSERT INTO project_credits (id_project, id_credit_type)
+  VALUES (LOCAL_ID, 3), (LOCAL_ID, 4), (LOCAL_ID, 6), (LOCAL_ID, 12)
+  ON DUPLICATE KEY UPDATE id_project=VALUES(id_project);
+  -- IDs conocidos: 3=Cofinavit, 4=Bancarios, 6=Fovissste para todos, 12=Apoyo Infonavit
+
+  G) PROMOCIÓN:
+  INSERT INTO project_promotions
+    (project_id, title, description, is_active, created_at, updated_at)
+  VALUES (LOCAL_ID, 'TÍTULO', 'descripción', 1, NOW(), NOW())
+  ON DUPLICATE KEY UPDATE title=VALUES(title), is_active=VALUES(is_active);
+
+PASO 4 — Valida en local
+  curl http://localhost:3000/proyectos/id/[LOCAL_ID]
+    → Revisar: credit_types, hasPropertyWithEdgeCertification, promotion_active
+
+  curl http://localhost:3000/propiedades/properties_search?project=[LOCAL_ID]
+    → Revisar: lista de propiedades, precios
+
+  curl http://localhost:3000/amenidades/get_all/[LOCAL_ID]
+    → Revisar: amenidades texto e imagen
+
+  curl "http://localhost:3000/project-promotions/get-by-project/[LOCAL_ID]"
+    → Revisar: promoción activa
+
+PASO 5 — Actualiza este archivo
+  Actualiza la tabla de estado (sección anterior) con los conteos reales.
+  Marca el proyecto como completado con ✅ y anota el PROD_ID encontrado.
+
+================================================================================
+  ERRORES COMUNES Y SOLUCIONES
+================================================================================
+
+ERROR: Incorrect datetime value: '0000-00-00 00:00:00'
+  → Causa: La columna update_at rechaza fechas cero
+  → Solución: Siempre incluir created_at=NOW(), update_at=NOW() en el INSERT
+              de project_property_images
+
+ERROR: Cannot add or update a child row: foreign key constraint fails
+  → Causa: El id_property no existe en la tabla property todavía
+  → Solución: Insertar primero las propiedades (property), luego sus relaciones
+
+ERROR: Duplicate entry 'X' for key 'PRIMARY'
+  → Causa: El registro ya existe
+  → Solución: Usar ON DUPLICATE KEY UPDATE en vez de INSERT simple
+
+ERROR: Edge logo no aparece en ProjectCard
+  → Causa: No hay ninguna property con isEdgeCertified=1 para ese proyecto
+  → Solución: Asegurarse de que al menos 1 propiedad tenga isEdgeCertified=1
+              en la tabla property (la consulta es en project.sql.js)
+
+ERROR: Credit badges no aparecen
+  → Causa: Tabla project_credits vacía para ese proyecto
+  → Solución: Insertar los tipos de crédito en project_credits
+
+ERROR: Amenidades de texto no aparecen (solo círculos con imágenes)
+  → Causa: amenity_property solo tiene registros con name=NULL (solo imagen)
+  → Solución: Insertar amenidades con name IS NOT NULL (texto + ícono)
+
+================================================================================
+  CATÁLOGO DE IDs LOCALES DE CREDIT_TYPE
+================================================================================
+
+  SELECT id, name FROM credit_type;  -- para verificar en tu local
+
+  IDs confirmados:
+    3  → Cofinavit
+    4  → Bancarios
+    6  → Fovissste para todos
+    12 → Apoyo Infonavit
+
+================================================================================
+  NOTAS ADICIONALES
+================================================================================
+
+- El mapper de proyecto ID que usamos: local project 25 = preprod project 140
+  Verificado el 2025 en la tabla de la sección de estado (arriba).
+
+- Las imágenes en project_property_images y project_property_blueprints 
+  usan URLs absolutas que apuntan al servidor de producción/uploads.
+  En local el navegador cargará esas imágenes directamente desde prod (OK).
+
+- Los campos JSON (como interest_area, amenities en project) pueden contener
+  datos de áreas de interés distintos de amenity_property. Son dos fuentes 
+  separadas de datos, NO confundir:
+    · project.interest_area  → tarjetas en "Zona de interés"  
+    · amenity_property       → íconos de amenidades del proyecto
+
+- El frontend hace SSR para páginas de propiedad individual. Si los cambios
+  no se ven en el navegador, hacer hard-refresh (Ctrl+Shift+R) o reiniciar
+  el servidor Next.js.
+
+================================================================================

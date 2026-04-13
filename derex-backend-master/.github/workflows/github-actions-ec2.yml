@@ -1,0 +1,70 @@
+name: EC2 Deployment
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    name: Deploy to EC2 on master branch push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the files
+        uses: actions/checkout@v4
+
+      - name: Deploy to Server 1
+        uses: easingthemes/ssh-deploy@main
+        env:
+
+          SSH_PRIVATE_KEY: ${{ secrets.EC2_SSH_KEY }}
+          REMOTE_HOST: ${{ secrets.HOST_DNS }}
+          REMOTE_USER: ${{ secrets.USERNAME }}
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          AWS_CDN_URL : ${{ secrets.AWS_CDN_URL }}
+          AWS_S3_URL : ${{ secrets.AWS_S3_URL }}
+
+      - name: Executing remote ssh commands using ssh key
+        uses: appleboy/ssh-action@master
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          DB_HOST: ${{ secrets.DB_HOST }}
+          DB_USER: ${{ secrets.DB_USER }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+          DB_NAME: ${{ secrets.DB_NAME }}
+          AWS_CDN_URL : ${{ secrets.AWS_CDN_URL }}
+          AWS_S3_URL : ${{ secrets.AWS_S3_URL }}
+        with: 
+          envs: DB_HOST,DB_USER,DB_PASSWORD,DB_NAME,AWS_ACCESS_KEY_ID,AWS_SECRET_ACCESS_KEY,AWS_S3_URL,AWS_CDN_URL
+          host: ${{ secrets.HOST_DNS }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            sudo rm -rf node_modules package-lock.json .env
+            sudo npm install
+            touch .env
+            echo AWS_ACCESS_KEY_ID="$AWS_ACCESS_KEY_ID" >> .env
+            echo AWS_SECRET_ACCESS_KEY="$AWS_SECRET_ACCESS_KEY" >> .env
+            echo DB_HOST="$DB_HOST" >> .env
+            echo DB_USER="$DB_USER" >> .env
+            echo DB_PASSWORD="$DB_PASSWORD" >> .env
+            echo DB_NAME="$DB_NAME" >> .env
+            echo AWS_CDN_URL="$AWS_CDN_URL" >> .env
+            echo AWS_S3_URL="$AWS_S3_URL" >> .env
+
+  slackNotification:
+    needs: [deploy]
+    name: Slack Notification
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Slack Notification
+        uses: rtCamp/action-slack-notify@v2
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}

@@ -1,0 +1,16 @@
+FROM node:20-alpine
+WORKDIR /opt/app
+
+RUN apk add --no-cache python3 make g++ sqlite-dev
+
+COPY package.json package-lock.json* ./
+RUN npm install
+
+COPY . .
+
+ENV NODE_ENV=development
+RUN chmod +x ./scripts/start-with-bootstrap.sh
+EXPOSE 1337
+
+ENV APP_CMD=develop
+CMD ["sh", "./scripts/start-with-bootstrap.sh"]

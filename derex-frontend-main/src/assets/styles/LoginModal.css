@@ -1,0 +1,252 @@
+.login-modal-outer {
+  position: fixed;
+  background-color: rgba(0, 0, 0, 0.25);
+  top: 50%;
+  left: 50%;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transform: translate(-50%, -50%);
+  z-index: 10000;
+}
+.login-modal-box {
+  z-index: 999999;
+  padding: 1em;
+  border-radius: 0.25em;
+  background-color: white;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  width: 450px;
+  max-width: 100vw;
+  color: var(--main-grey);
+  flex-direction: column;
+  transition: 1s;
+  font-size: 1.15rem;
+}
+
+.login-modal-box > h2 {
+  font-family: "Viga";
+  text-align: center;
+  font-size: 1rem;
+  font-weight: 400;
+  margin-left: 2em;
+  margin-right: 2em;
+}
+
+.login-modal-box > p {
+  padding-left: 2rem;
+  padding-right: 2rem;
+  font-weight: 400;
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+.register-text {
+  margin: 1rem 0 2rem;
+}
+
+.text-successful-register {
+  margin-top: 1rem;
+}
+
+.login-modal-box > p > span {
+  color: var(--main-red);
+  font-weight: 600;
+}
+
+.login-modal-box > h3 {
+  text-align: left;
+  color: var(--main-black);
+  font-weight: 700;
+  font-size: 0.9rem;
+  align-self: stretch;
+}
+
+.login-modal-box > form {
+  width: 100%;
+}
+
+.container-input-login {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  border-bottom: 1px solid var(--light-grey);
+  margin-bottom: 0.5rem;
+}
+
+.container-input-login > p {
+  margin: 0.08rem 0 0 0;
+  font-size: 0.85rem;
+  padding: 0;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.container-input-login > input {
+  outline: none;
+  border: none;
+  padding-bottom: 0.5rem;
+  align-self: stretch;
+  color: var(--main-black);
+  font-weight: 700;
+  font-size: 0.85rem;
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.container-input-login > .prefix-tel-mx {
+  color: var(--main-black);
+  padding-left: 0.5rem;
+  text-align: end;
+}
+
+.container-input-login > .input-tel {
+  padding-left: 0.25rem;
+}
+
+.container-input-login > div {
+  cursor: pointer;
+}
+
+.login-row,
+.container-accept-policy {
+  display: flex;
+  align-items: center;
+}
+
+.container-accept-policy {
+  margin-top: 1rem;
+}
+
+.container-accept-policy > p {
+  font-size: 12px;
+  margin-left: 0.9rem;
+}
+
+.divider-login {
+  border-top: 1px solid var(--light-grey);
+  width: 100%;
+  margin: 3rem 0 2rem 0;
+}
+
+.javer-logo-login {
+  background-image: url("../../assets/images/footer-logo.png");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 200px;
+  height: 50px;
+  opacity: 0.5;
+  margin: 1rem auto 2rem auto;
+}
+
+.login-button {
+  border: none;
+  outline: none;
+  border-radius: 0.25em;
+  background-color: var(--lightest-grey);
+  color: var(--main-grey);
+  padding: 1rem 2rem 1rem 2rem;
+  font-weight: 600;
+  align-self: flex-end;
+  border-radius: 0.25em;
+  text-transform: capitalize;
+  align-self: center;
+  margin-top: 2em;
+  font-size: 0.9rem;
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+  cursor: default;
+}
+
+.login-button.active {
+  background-color: var(--main-red);
+  color: var(--lightest-grey);
+  cursor: pointer;
+}
+
+.login-modal-box > sub {
+  font-size: 0.8rem;
+  border-top: 1px solid var(--light-grey);
+  align-self: stretch;
+  margin-top: 1em;
+  text-align: center;
+  padding-top: 1em;
+  margin-bottom: 2em;
+}
+
+.login-modal-box > a {
+  font-size: 0.9rem;
+  margin: 0;
+  padding: 0;
+  margin-top: 1em;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.login-sso-row {
+  display: flex;
+}
+
+.login-sso-row > div {
+  width: 1.5em;
+  height: 1.5em;
+  margin: 0.25em;
+}
+
+.sso-icon-google {
+  background-size: cover;
+  background-image: url("../../assets/images/icon_google.png");
+}
+
+.sso-icon-facebook {
+  background-size: cover;
+  background-image: url("../../assets/images/icon_facebook.png");
+}
+
+.login-close {
+  width: 1em;
+  height: 1em;
+  background-image: url("../../assets/images/close-cross.png");
+  cursor: pointer;
+  background-size: cover;
+  align-self: flex-end;
+}
+
+.email-valid-prompt,
+.password-valid-prompt {
+  font-size: 0.75rem;
+  font-weight: 700;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.password-valid-prompt {
+  margin-top: 0;
+}
+
+.login-bot-dots {
+  margin: 2em;
+}
+
+.text-successful-register {
+  text-align: justify !important;
+}
+
+.text-successful-register > span {
+  font-weight: 400 !important;
+}
+
+@media (max-width: 1000px) {
+  .login-modal-box {
+    width: calc(100% - 6em);
+    font-size: 2.5vh;
+  }
+
+  .login-modal-box > input {
+    width: auto;
+  }
+}

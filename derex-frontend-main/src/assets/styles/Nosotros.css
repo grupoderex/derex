@@ -1,0 +1,126 @@
+.conoce-window {
+  width: 100%;
+  min-height: calc(100vh - 4rem);
+  position: relative;
+}
+
+.cw0 > h1 {
+  position: absolute;
+  width: 8em;
+  bottom: 0;
+  font-size: 4rem;
+  left: 2em;
+  margin-bottom: 2em;
+  color: #fff;
+  font-family: "Viga";
+  transition: 1s;
+  transition-timing-function: ease-in-out;
+  transition-delay: 0.5s;
+}
+
+.conoce-img-main {
+  background-size: cover;
+  background-position: center;
+  position: absolute;
+  top: 0;
+  right: 1em;
+  bottom: 1em;
+  width: calc(100% - 2em);
+  transition: 0.5s;
+  transition-timing-function: ease-in-out;
+}
+
+.conoce-text-ronnie {
+  display: flex;
+  flex-direction: column;
+  /* flex-grow: 1; */
+  align-self: stretch;
+  padding: 2em;
+  overflow-y: scroll;
+  /* max-height: 90%; */
+}
+
+.conoce-text-ronnie > h1 {
+  font-size: 3rem;
+  font-weight: 400;
+  font-family: "Viga";
+  text-align: start;
+  color: var(--main-grey);
+}
+
+.conoce-text-ronnie > h1 > span {
+  font-weight: 400;
+  font-family: "Viga";
+  color: var(--main-red);
+}
+
+.conoce-text-ronnie > p {
+  font-size: 1.1rem;
+  color: var(--main-grey);
+  font-weight: 400;
+}
+
+.conoce-text-ronnie > p > span {
+  color: var(--main-red);
+}
+
+.conoce-text-team {
+  padding: 1em;
+  overflow-y: scroll;
+  /* max-height: 90%; */
+  font-weight: 700;
+  color: var(--main-grey);
+}
+
+.conoce-text-team > h1 {
+  font-size: 3rem;
+  font-weight: 400;
+  font-family: "Viga";
+  text-align: start;
+}
+.conoce-text-team > h2 {
+  font-size: 2rem;
+  padding: 0.3rem 0 0.3rem 0;
+  color: var(--main-red);
+}
+
+.conoce-text-team > p {
+  font-size: 1.2rem;
+  font-weight: 400;
+}
+
+@media (max-width: 1000px) {
+  /* .conoce-window { */
+  /*   min-height: 600px; */
+  /* } */
+
+  .conoce-img-main {
+    top: 0;
+    right: 1em;
+    bottom: auto;
+    height: calc(100% - 8em);
+    width: auto;
+    left: 1em;
+    transition: 0.5s;
+    transition-timing-function: ease-in-out;
+  }
+
+  .cw0 > h1 {
+    font-size: 2rem;
+    margin-bottom: 5em;
+  }
+
+  .conoce-text-ronnie > h1,
+  .conoce-text-team > h1 {
+    font-size: 2rem;
+  }
+
+  .conoce-text-ronnie > p,
+  .conoce-text-team > p {
+    font-size: 1rem;
+  }
+
+  .conoce-text-team > h2 {
+    font-size: 1.5rem;
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_blog_i_frames",
+  "info": {
+    "displayName": "IFrame",
+    "description": "Embed iframe HTML"
+  },
+  "options": {},
+  "attributes": {
+    "content": {
+      "type": "text",
+      "required": true
+    }
+  }
+}

@@ -1,0 +1,18 @@
+{
+  "collectionName": "components_blog_contents",
+  "info": {
+    "displayName": "Content",
+    "description": "Rich text block"
+  },
+  "options": {},
+  "attributes": {
+    "rich_text": {
+      "type": "richtext",
+      "options": {
+        "preset": "defaultHtml"
+      },
+      "customField": "plugin::ckeditor5.CKEditor",
+      "required": true
+    }
+  }
+}

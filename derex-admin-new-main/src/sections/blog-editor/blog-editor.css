@@ -1,0 +1,112 @@
+.wrapper {
+  border: 2px solid rgba(24, 119, 242, 0.1);
+  border-radius: 5px;
+  padding: 10px;
+}
+
+.toolbar {
+  border: 1px solid rgba(24, 119, 242, 0.1);
+  border-radius: 5px;
+}
+
+.editor {
+  border: 1px solid rgba(24, 119, 242, 0.1);
+  border-radius: 5px;
+}
+
+.wrapper,
+.toolbar,
+.editor {
+  outline: none;
+  box-shadow: none;
+}
+
+/* Increase icon size */
+.rdw-option-wrapper svg {
+  font-size: 30px;
+}
+
+/* Increase icon button size */
+.rdw-option-wrapper {
+  height: 40px;
+  width: 40px;
+}
+
+/* Increase dropdown icon size */
+.rdw-link-modal-button svg,
+.rdw-embedded-modal-button svg {
+  height: 25px;
+  width: 25px;
+}
+/* Base Input Style */
+.base-input {
+  width: 100%;
+  padding: 8px 12px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(24, 119, 242, 0.2);
+  border-radius: 4px;
+  box-shadow: inset 0 1px 3px rgba(24, 119, 242, 0.1);
+  transition: border-color 0.2s;
+  font-family: 'Public Sans', 'sans-serif';
+}
+
+.base-input:focus {
+  outline: none;
+  border-color: rgba(24, 119, 242, 0.5);
+}
+
+/* Specific styles for each field */
+.title-input,
+.author-input,
+.description-input,
+.region-input {
+  font-size: 1rem;
+}
+
+.title-input {
+  font-weight: bold;
+}
+
+.region-input {
+  font-style: italic;
+}
+
+.description-input {
+  height: 80px; /* Larger area for description */
+}
+
+/* Adjust margins for better layout */
+.input-group {
+  margin-bottom: 20px;
+}
+
+/* Styling for publish and save draft buttons to align with new design */
+button.publish,
+button.save-draft {
+  background-color: rgba(24, 119, 242, 0.1);
+  border-radius: 8px;
+  font-size: 16px;
+  height: 40px;
+  margin-right: 10px;
+  margin-top: 10px;
+  color: rgba(24, 119, 242, 1);
+  border: 2px solid rgba(24, 119, 242, 1);
+  padding: 5px 15px;
+  cursor: pointer;
+  transition:
+    background-color 0.2s,
+    color 0.2s;
+}
+
+button.publish:hover,
+button.save-draft:hover {
+  background-color: rgba(24, 119, 242, 0.2);
+  color: rgba(24, 119, 242, 0.9);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .base-input {
+    width: 100%;
+  }
+}

@@ -1,0 +1,5 @@
+export { Features } from './Features'
+export { VirtualTour } from './VirtualTour'
+export { ContactForm } from './ContactForm'
+export { Outstanding } from './Outstanding'
+export { EdgeCertified } from './EdgeCertified'
