@@ -156,10 +156,10 @@ export function GalleryModels({
               <CarouselItem
                 key={index}
                 className={`${getCarouselItemBasis()} min-w-0 ${width && width < 768
-                    ? "pl-0 pr-0"
-                    : shouldDistributeEqually
-                      ? "pl-0"
-                      : "pl-2"
+                  ? "pl-0 pr-0"
+                  : shouldDistributeEqually
+                    ? "pl-0"
+                    : "pl-2"
                   } ${classNames?.Carousel?.Item}`}
               >
                 <HoverableImage
