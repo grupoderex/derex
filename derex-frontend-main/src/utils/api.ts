@@ -6,27 +6,27 @@ import { type BlogCategoryResponse } from "@/models/blog_category";
 import { type BlogTopicsResponse } from "@/models/blog_topic";
 import { type CertificationsAndAwardsResponse } from "@/models/certifications";
 import {
-    type ClientExperienceListResponse,
-    type ClientExperienceResponse,
+  type ClientExperienceListResponse,
+  type ClientExperienceResponse,
 } from "@/models/client_experience";
 import { type ContratosDeAdhesionResponse } from "@/models/contratos_de_adhesion";
 import { type CustomerServiceReportFormData } from "@/models/customer_service_report_form_data";
 import { type DecalogueResponse } from "@/models/decalogue";
 import { type DecaloguesResponse } from "@/models/decalogues";
 import {
-    type FrequentQuestion,
-    type FrequentQuestionResponse,
+  type FrequentQuestion,
+  type FrequentQuestionResponse,
 } from "@/models/frequent-question";
 import {
-    ResponseFormatted,
-    type LocationHierarchy,
+  ResponseFormatted,
+  type LocationHierarchy,
 } from "@/models/location_hierarchy";
 import { type LotesFormData } from "@/models/lotes_form_data";
 import {
-    type AvailableSections,
-    type GetTitlesResponse,
-    type MetadataTitle,
-    type ParsedKnowJaver,
+  type AvailableSections,
+  type GetTitlesResponse,
+  type MetadataTitle,
+  type ParsedKnowJaver,
 } from "@/models/metadata";
 import { type ModelsForHome } from "@/models/models_for_home";
 import { type BlogItem, type BlogsResponse } from "@/models/new_blog";
@@ -124,21 +124,21 @@ export async function postTerritorialReservationsForm(
 
 export async function getActiveSections(): Promise<SectionResponse> {
   try {
-  return await fetch(`${BACKEND_URL}/secciones/all`, {
-    next: { revalidate: 3600 }, // ISR: Cache 1 hora - Secciones navbar/footer cambian raramente
-  }).then<SectionResponse>(async (res) => {
-    if (res.ok) return await res.json();
-    if (isDevelopment) return { navbar: [], footer: [] } as SectionResponse;
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
+    return await fetch(`${BACKEND_URL}/secciones/all`, {
+      next: { revalidate: 3600 }, // ISR: Cache 1 hora - Secciones navbar/footer cambian raramente
+    }).then<SectionResponse>(async (res) => {
+      if (res.ok) return await res.json();
       if (isDevelopment) return { navbar: [], footer: [] } as SectionResponse;
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        if (isDevelopment) return { navbar: [], footer: [] } as SectionResponse;
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return { navbar: [], footer: [] };
     throw new ApiError("No fue posible obtener las secciones", 503);
@@ -147,19 +147,19 @@ export async function getActiveSections(): Promise<SectionResponse> {
 
 export async function getDocuments() {
   try {
-  return await fetch(`${BACKEND_URL}/documentos/allByPages`, {
-    next: { revalidate: 3600 }, // ISR: Cache 1 hora - Documentos cambian raramente
-  }).then(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    return await fetch(`${BACKEND_URL}/documentos/allByPages`, {
+      next: { revalidate: 3600 }, // ISR: Cache 1 hora - Documentos cambian raramente
+    }).then(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return [];
     throw new ApiError("No fue posible obtener los documentos", 503);
@@ -168,19 +168,19 @@ export async function getDocuments() {
 
 export async function getContratosAdhesion() {
   try {
-  return await fetch(`${BACKEND_URL}/documentos/contratos_adhesion`, {
-    next: { revalidate: 3600 }, // ISR: Cache 1 hora - Contratos de adhesión cambian raramente
-  }).then<ContratosDeAdhesionResponse>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    return await fetch(`${BACKEND_URL}/documentos/contratos_adhesion`, {
+      next: { revalidate: 3600 }, // ISR: Cache 1 hora - Contratos de adhesión cambian raramente
+    }).then<ContratosDeAdhesionResponse>(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return [] as unknown as ContratosDeAdhesionResponse;
     throw new ApiError("No fue posible obtener los contratos", 503);
@@ -189,39 +189,39 @@ export async function getContratosAdhesion() {
 
 export async function getWebsiteMedia() {
   try {
-  return await fetch(`${BACKEND_URL}/estilos`, {
-    next: { revalidate: 3600 }, // ISR: Cache 1 hora - Media del sitio (videos, imágenes) cambia raramente
-  })
-    .then<WebsiteMedia[]>(async (res) => {
-      if (res.ok) return await res.json();
-      if (isDevelopment) return [];
-      try {
-        const data = await res.json();
-        if ("error" in data && typeof data.error === "string")
-          throw new ApiError(data.error as string, res.status);
-        else throw new ApiError("Error desconocido", res.status);
-      } catch {
-        if (isDevelopment) return [];
-        throw new ApiError("Error desconocido", res.status);
-      }
+    return await fetch(`${BACKEND_URL}/estilos`, {
+      next: { revalidate: 3600 }, // ISR: Cache 1 hora - Media del sitio (videos, imágenes) cambia raramente
     })
-    .then((data) => {
-      return data.reduce((acc, item) => {
-        switch (item.key) {
-          case "lotes_image":
-            acc.lotes_alt = item.alt_text;
-            break;
-          case "reservas_image":
-            acc.reservas_alt = item.alt_text;
-            break;
-          default:
-            acc[item.key as keyof WebsiteMediaObject] = item.value;
-            break;
+      .then<WebsiteMedia[]>(async (res) => {
+        if (res.ok) return await res.json();
+        if (isDevelopment) return [];
+        try {
+          const data = await res.json();
+          if ("error" in data && typeof data.error === "string")
+            throw new ApiError(data.error as string, res.status);
+          else throw new ApiError("Error desconocido", res.status);
+        } catch {
+          if (isDevelopment) return [];
+          throw new ApiError("Error desconocido", res.status);
         }
+      })
+      .then((data) => {
+        return data.reduce((acc, item) => {
+          switch (item.key) {
+            case "lotes_image":
+              acc.lotes_alt = item.alt_text;
+              break;
+            case "reservas_image":
+              acc.reservas_alt = item.alt_text;
+              break;
+            default:
+              acc[item.key as keyof WebsiteMediaObject] = item.value;
+              break;
+          }
 
-        return acc;
-      }, {} as WebsiteMediaObject);
-    });
+          return acc;
+        }, {} as WebsiteMediaObject);
+      });
   } catch {
     if (isDevelopment) return {} as WebsiteMediaObject;
     throw new ApiError("No fue posible obtener los estilos del sitio", 503);
@@ -242,19 +242,19 @@ export async function getMedia() {
 
 export async function getFullDataDesarrollos() {
   try {
-  return await fetch(`${BACKEND_URL}/location/location_hierarchy/formatted`, {
-    next: { revalidate: 600 }, // ISR: Cache 10 minutos - Desarrollos se actualizan periódicamente
-  }).then<ResponseFormatted>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    return await fetch(`${BACKEND_URL}/location/location_hierarchy/formatted`, {
+      next: { revalidate: 600 }, // ISR: Cache 10 minutos - Desarrollos se actualizan periódicamente
+    }).then<ResponseFormatted>(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return { data: [] } as unknown as ResponseFormatted;
     throw new ApiError("No fue posible obtener la jerarquía de ubicaciones", 503);
@@ -419,19 +419,19 @@ export async function setFavoritesUserAPI(token: string, propertyId: number) {
 
 export async function getProjectByID(id: number, showHidden: boolean = false) {
   try {
-  return await fetch(
-    `${BACKEND_URL}/proyectos/id/${id}?show_invisible=${showHidden}`
-  ).then<Project>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    return await fetch(
+      `${BACKEND_URL}/proyectos/id/${id}?show_invisible=${showHidden}`
+    ).then<Project>(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return null as unknown as Project;
     throw new ApiError("No fue posible obtener el proyecto", 503);
@@ -440,19 +440,19 @@ export async function getProjectByID(id: number, showHidden: boolean = false) {
 
 export async function getFileByName(name: string) {
   try {
-  return await fetch(`${BACKEND_URL}/proyectos/get-document-url/${name}`).then<{
-    document_url: string;
-  }>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    return await fetch(`${BACKEND_URL}/proyectos/get-document-url/${name}`).then<{
+      document_url: string;
+    }>(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return { document_url: "" };
     throw new ApiError("No fue posible obtener el documento", 503);
@@ -461,19 +461,19 @@ export async function getFileByName(name: string) {
 
 export async function getProjects(showHidden: boolean = false): Promise<Project[]> {
   try {
-  return await fetch(`${BACKEND_URL}/proyectos?show_invisible=${showHidden}`, {
-    next: { revalidate: 600 }, // ISR: Cache 10 minutos - Lista de proyectos se actualiza periódicamente
-  }).then<Project[]>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    return await fetch(`${BACKEND_URL}/proyectos?show_invisible=${showHidden}`, {
+      next: { revalidate: 600 }, // ISR: Cache 10 minutos - Lista de proyectos se actualiza periódicamente
+    }).then<Project[]>(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return [];
     throw new ApiError("No fue posible obtener los proyectos", 503);
@@ -482,17 +482,17 @@ export async function getProjects(showHidden: boolean = false): Promise<Project[
 
 export async function getEstados(): Promise<State[]> {
   try {
-  return await fetch(`${BACKEND_URL}/estados`).then<State[]>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    return await fetch(`${BACKEND_URL}/estados`).then<State[]>(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return [];
     throw new ApiError("No fue posible obtener los estados", 503);
@@ -501,17 +501,17 @@ export async function getEstados(): Promise<State[]> {
 
 export async function getBlogByID(id: number) {
   try {
-  return await fetch(`${BACKEND_URL}/blog/id/${id}`).then(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    return await fetch(`${BACKEND_URL}/blog/id/${id}`).then(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return null;
     throw new ApiError("No fue posible obtener el blog", 503);
@@ -530,41 +530,40 @@ export async function getPropertiesSearch({
   showHidden?: boolean;
 }) {
   try {
-  return await fetch(
-    `${BACKEND_URL}/propiedades/properties_search?${
-      stateId ? "state=" + stateId : "project=" + projectId
-    }${type ? `&type=${type}` : ""}&show_invisible=${showHidden}`
-  )
-    .then<PropertySearch[]>(async (res) => {
-      if (res.ok) return await res.json();
-      try {
-        const data = await res.json();
-        if ("error" in data && typeof data.error === "string")
-          throw new ApiError(data.error as string, res.status);
-        else throw new ApiError("Error desconocido", res.status);
-      } catch {
-        throw new ApiError("Error desconocido", res.status);
-      }
-    })
-    .then((data) => {
-      return data.map((item) => {
-        const addressParts = item.full_address?.split(" ");
-        const splitIndex = Math.floor(addressParts?.length / 2);
-        return {
-          ...item,
-          video_url: item?.video_url ?? "",
-          materport_url: item?.materport_video,
-          address0: addressParts?.slice(0, splitIndex).join(" "),
-          address1: addressParts?.slice(splitIndex).join(" "),
-          delivery_status: item.delivery_status
-            ? "Entrega inmediata"
-            : "En Construccion",
-          construction_status: item.construction_status
-            ? "Lista para Habitar"
-            : "En obra blanca",
-        };
+    return await fetch(
+      `${BACKEND_URL}/propiedades/properties_search?${stateId ? "state=" + stateId : "project=" + projectId
+      }${type ? `&type=${type}` : ""}&show_invisible=${showHidden}`
+    )
+      .then<PropertySearch[]>(async (res) => {
+        if (res.ok) return await res.json();
+        try {
+          const data = await res.json();
+          if ("error" in data && typeof data.error === "string")
+            throw new ApiError(data.error as string, res.status);
+          else throw new ApiError("Error desconocido", res.status);
+        } catch {
+          throw new ApiError("Error desconocido", res.status);
+        }
+      })
+      .then((data) => {
+        return data.map((item) => {
+          const addressParts = item.full_address?.split(" ");
+          const splitIndex = Math.floor(addressParts?.length / 2);
+          return {
+            ...item,
+            video_url: item?.video_url ?? "",
+            materport_url: item?.materport_video,
+            address0: addressParts?.slice(0, splitIndex).join(" "),
+            address1: addressParts?.slice(splitIndex).join(" "),
+            delivery_status: item.delivery_status
+              ? "Entrega inmediata"
+              : "En Construccion",
+            construction_status: item.construction_status
+              ? "Lista para Habitar"
+              : "En obra blanca",
+          };
+        });
       });
-    });
   } catch {
     if (isDevelopment) return [];
     throw new ApiError("No fue posible obtener las propiedades", 503);
@@ -573,29 +572,9 @@ export async function getPropertiesSearch({
 
 export async function getPropertyById(id: number, showHidden: boolean = false) {
   try {
-  return await fetch(
-    `${BACKEND_URL}/propiedades/id/${id}?show_invisible=${showHidden}`
-  ).then<Property>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
-  } catch {
-    if (isDevelopment) return null as unknown as Property;
-    throw new ApiError("No fue posible obtener la propiedad", 503);
-  }
-}
-
-export async function getBlogArticles() {
-  try {
-  return await fetch(`${BACKEND_URL}/blog/active-blogs`)
-    .then<Blog[]>(async (res) => {
+    return await fetch(
+      `${BACKEND_URL}/propiedades/id/${id}?show_invisible=${showHidden}`
+    ).then<Property>(async (res) => {
       if (res.ok) return await res.json();
       try {
         const data = await res.json();
@@ -605,22 +584,42 @@ export async function getBlogArticles() {
       } catch {
         throw new ApiError("Error desconocido", res.status);
       }
-    })
-    .then((data) => {
-      return data.map((post) => {
-        return {
-          id: post.id,
-          section: post.post_section,
-          title: post.post_title,
-          description: post.description,
-          image: post.post_image1,
-          date: post.post_date,
-          author: post.post_author,
-          content: post.post_content,
-          url: post.permalink,
-        };
-      });
     });
+  } catch {
+    if (isDevelopment) return null as unknown as Property;
+    throw new ApiError("No fue posible obtener la propiedad", 503);
+  }
+}
+
+export async function getBlogArticles() {
+  try {
+    return await fetch(`${BACKEND_URL}/blog/active-blogs`)
+      .then<Blog[]>(async (res) => {
+        if (res.ok) return await res.json();
+        try {
+          const data = await res.json();
+          if ("error" in data && typeof data.error === "string")
+            throw new ApiError(data.error as string, res.status);
+          else throw new ApiError("Error desconocido", res.status);
+        } catch {
+          throw new ApiError("Error desconocido", res.status);
+        }
+      })
+      .then((data) => {
+        return data.map((post) => {
+          return {
+            id: post.id,
+            section: post.post_section,
+            title: post.post_title,
+            description: post.description,
+            image: post.post_image1,
+            date: post.post_date,
+            author: post.post_author,
+            content: post.post_content,
+            url: post.permalink,
+          };
+        });
+      });
   } catch {
     if (isDevelopment) return [];
     throw new ApiError("No fue posible obtener los artículos", 503);
@@ -632,19 +631,19 @@ export async function getAmenitiesByProjectId(
   type: "text" | "image"
 ) {
   try {
-  return await fetch(
-    `${BACKEND_URL}/amenidades/get_all/${projectId}?type=${type ?? ""}`
-  ).then<AmenitiesResponse>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    return await fetch(
+      `${BACKEND_URL}/amenidades/get_all/${projectId}?type=${type ?? ""}`
+    ).then<AmenitiesResponse>(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return { success: false, amenities: [] } as unknown as AmenitiesResponse;
     throw new ApiError("No fue posible obtener las amenidades", 503);
@@ -659,27 +658,26 @@ export async function getAllProjectsByFilters(filters?: {
   price_max?: number;
 }) {
   try {
-  return await fetch(
-    `${BACKEND_URL}/proyectos/get-all-projects-by-filters?${
-      filters
+    return await fetch(
+      `${BACKEND_URL}/proyectos/get-all-projects-by-filters?${filters
         ? new URLSearchParams(
-            Object.entries(filters)
-              .filter(([, value]) => value !== undefined)
-              .map(([key, value]) => [key, value.toString()])
-          ).toString()
+          Object.entries(filters)
+            .filter(([, value]) => value !== undefined)
+            .map(([key, value]) => [key, value.toString()])
+        ).toString()
         : ""
-    }`
-  ).then<ProjectByFiltersResult[]>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+      }`
+    ).then<ProjectByFiltersResult[]>(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return [];
     throw new ApiError("No fue posible obtener los proyectos filtrados", 503);
@@ -691,59 +689,17 @@ export async function getAllStateCitiesFilters(filters?: {
   city_id?: number;
 }) {
   try {
-  return await fetch(
-    `${BACKEND_URL}/estados/get-all-states-cities-filters?${
-      filters
+    return await fetch(
+      `${BACKEND_URL}/estados/get-all-states-cities-filters?${filters
         ? new URLSearchParams(
-            Object.entries(filters).map(([key, value]) => [
-              key,
-              value.toString(),
-            ])
-          ).toString()
+          Object.entries(filters).map(([key, value]) => [
+            key,
+            value.toString(),
+          ])
+        ).toString()
         : ""
-    }`
-  ).then<StateCityFilters[]>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
-  } catch {
-    if (isDevelopment) return [];
-    throw new ApiError("No fue posible obtener los filtros de estados/ciudades", 503);
-  }
-}
-
-export async function getAllPropertiesHome(): Promise<ModelsForHome[]> {
-  try {
-  return await fetch(
-    `${BACKEND_URL}/propiedades/get-all-properties-for-home`
-  ).then<ModelsForHome[]>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
-  } catch {
-    if (isDevelopment) return [];
-    throw new ApiError("No fue posible obtener las propiedades", 503);
-  }
-}
-
-export async function getAllTitles() {
-  try {
-  return await fetch(`${BACKEND_URL}/meta`).then<GetTitlesResponse>(
-    async (res) => {
+      }`
+    ).then<StateCityFilters[]>(async (res) => {
       if (res.ok) return await res.json();
       try {
         const data = await res.json();
@@ -753,8 +709,49 @@ export async function getAllTitles() {
       } catch {
         throw new ApiError("Error desconocido", res.status);
       }
-    }
-  );
+    });
+  } catch {
+    if (isDevelopment) return [];
+    throw new ApiError("No fue posible obtener los filtros de estados/ciudades", 503);
+  }
+}
+
+export async function getAllPropertiesHome(): Promise<ModelsForHome[]> {
+  try {
+    return await fetch(
+      `${BACKEND_URL}/propiedades/get-all-properties-for-home`
+    ).then<ModelsForHome[]>(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
+  } catch {
+    if (isDevelopment) return [];
+    throw new ApiError("No fue posible obtener las propiedades", 503);
+  }
+}
+
+export async function getAllTitles() {
+  try {
+    return await fetch(`${BACKEND_URL}/meta`).then<GetTitlesResponse>(
+      async (res) => {
+        if (res.ok) return await res.json();
+        try {
+          const data = await res.json();
+          if ("error" in data && typeof data.error === "string")
+            throw new ApiError(data.error as string, res.status);
+          else throw new ApiError("Error desconocido", res.status);
+        } catch {
+          throw new ApiError("Error desconocido", res.status);
+        }
+      }
+    );
   } catch {
     if (isDevelopment) return { data: [] } as unknown as GetTitlesResponse;
     throw new ApiError("No fue posible obtener los títulos", 503);
@@ -788,9 +785,8 @@ export async function getTitlesBySection(section: AvailableSections) {
   return response.data.reduce<Record<string, MetadataTitle>>((acc, meta) => {
     acc[meta.name] = {
       ...meta,
-      className: `${meta.outline ? "text-stroke" : ""} ${
-        meta.color ? "text-primary" : "text-foreground"
-      }`.trim(),
+      className: `${meta.outline ? "text-stroke" : ""} ${meta.color ? "text-primary" : "text-foreground"
+        }`.trim(),
     };
     return acc;
   }, {});
@@ -857,19 +853,19 @@ export async function getKnowJaver() {
 
 export async function getFAQs() {
   try {
-  return await fetch(
-    `${BACKEND_URL}/frequent-questions`
-  ).then<FrequentQuestionResponse>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    return await fetch(
+      `${BACKEND_URL}/frequent-questions`
+    ).then<FrequentQuestionResponse>(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return { data: [] } as unknown as FrequentQuestionResponse;
     throw new ApiError("No fue posible obtener las preguntas frecuentes", 503);
@@ -878,19 +874,19 @@ export async function getFAQs() {
 
 export async function getFAQById(id: number) {
   try {
-  return await fetch(
-    `${BACKEND_URL}/frequent-questions/id/${id}`
-  ).then<FrequentQuestion>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    return await fetch(
+      `${BACKEND_URL}/frequent-questions/id/${id}`
+    ).then<FrequentQuestion>(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return null as unknown as FrequentQuestion;
     throw new ApiError("No fue posible obtener la pregunta frecuente", 503);
@@ -899,19 +895,19 @@ export async function getFAQById(id: number) {
 
 export async function getAllClientExperiences() {
   try {
-  return await fetch(
-    `${BACKEND_URL}/customer-experience/`
-  ).then<ClientExperienceListResponse>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    return await fetch(
+      `${BACKEND_URL}/customer-experience/`
+    ).then<ClientExperienceListResponse>(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return { data: [] } as unknown as ClientExperienceListResponse;
     throw new ApiError("No fue posible obtener las experiencias", 503);
@@ -920,19 +916,19 @@ export async function getAllClientExperiences() {
 
 export async function getClientExperienceById(id: number) {
   try {
-  return await fetch(
-    `${BACKEND_URL}/customer-experience/id/${id}`
-  ).then<ClientExperienceResponse>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    return await fetch(
+      `${BACKEND_URL}/customer-experience/id/${id}`
+    ).then<ClientExperienceResponse>(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return {} as ClientExperienceResponse;
     throw new ApiError("No fue posible obtener la experiencia", 503);
@@ -969,8 +965,30 @@ export async function getAllAboutSections() {
 
 export async function getSNS() {
   try {
-  return await fetch(`${BACKEND_URL}/social/`).then<SNSResponse>(
-    async (res) => {
+    return await fetch(`${BACKEND_URL}/social/`).then<SNSResponse>(
+      async (res) => {
+        if (res.ok) return await res.json();
+        try {
+          const data = await res.json();
+          if ("error" in data && typeof data.error === "string")
+            throw new ApiError(data.error as string, res.status);
+          else throw new ApiError("Error desconocido", res.status);
+        } catch {
+          throw new ApiError("Error desconocido", res.status);
+        }
+      }
+    );
+  } catch {
+    if (isDevelopment) return [] as unknown as SNSResponse;
+    throw new ApiError("No fue posible obtener las redes sociales", 503);
+  }
+}
+
+export async function getDecalogues(type: "decalogue" | "notice") {
+  try {
+    return await fetch(`${BACKEND_URL}/section-decalogue/type/${type}`, {
+      next: { revalidate: 3600 }, // ISR: Cache 1 hora - Decálogos cambian raramente
+    }).then<DecaloguesResponse>(async (res) => {
       if (res.ok) return await res.json();
       try {
         const data = await res.json();
@@ -980,29 +998,7 @@ export async function getSNS() {
       } catch {
         throw new ApiError("Error desconocido", res.status);
       }
-    }
-  );
-  } catch {
-    if (isDevelopment) return [] as unknown as SNSResponse;
-    throw new ApiError("No fue posible obtener las redes sociales", 503);
-  }
-}
-
-export async function getDecalogues(type: "decalogue" | "notice") {
-  try {
-  return await fetch(`${BACKEND_URL}/section-decalogue/type/${type}`, {
-    next: { revalidate: 3600 }, // ISR: Cache 1 hora - Decálogos cambian raramente
-  }).then<DecaloguesResponse>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    });
   } catch {
     if (isDevelopment) return { data: [] } as unknown as DecaloguesResponse;
     throw new ApiError("No fue posible obtener el decálogo", 503);
@@ -1011,19 +1007,19 @@ export async function getDecalogues(type: "decalogue" | "notice") {
 
 export async function getDecalogueById(id: number) {
   try {
-  return await fetch(`${BACKEND_URL}/decalogue/id/${id}`, {
-    next: { revalidate: 600 }, // ISR: Cache 10 minutos - Decálogos individuales cambian ocasionalmente
-  }).then<DecalogueResponse>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    return await fetch(`${BACKEND_URL}/decalogue/id/${id}`, {
+      next: { revalidate: 600 }, // ISR: Cache 10 minutos - Decálogos individuales cambian ocasionalmente
+    }).then<DecalogueResponse>(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return {} as DecalogueResponse;
     throw new ApiError("No fue posible obtener el decálogo", 503);
@@ -1032,19 +1028,19 @@ export async function getDecalogueById(id: number) {
 
 export async function getAllCertificationsAndAwards() {
   try {
-  return await fetch(`${BACKEND_URL}/certifications`, {
-    next: { revalidate: 3600 }, // ISR: Cache 1 hora - Certificaciones cambian raramente
-  }).then<CertificationsAndAwardsResponse>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    return await fetch(`${BACKEND_URL}/certifications`, {
+      next: { revalidate: 3600 }, // ISR: Cache 1 hora - Certificaciones cambian raramente
+    }).then<CertificationsAndAwardsResponse>(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return { data: [] } as unknown as CertificationsAndAwardsResponse;
     throw new ApiError("No fue posible obtener las certificaciones", 503);
@@ -1088,19 +1084,19 @@ export async function getFeaturedBlogs(locale: string) {
   );
 
   try {
-  return await fetch(
-    `${BLOG_URL}/api/blogs?status=published&${query}`
-  ).then<BlogsResponse>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    return await fetch(
+      `${BLOG_URL}/api/blogs?status=published&${query}`
+    ).then<BlogsResponse>(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return { data: [] } as unknown as BlogsResponse;
     throw new ApiError("No fue posible obtener los blogs destacados", 503);
@@ -1123,19 +1119,19 @@ export async function getLatestBlogs(locale: string, limit: number = 5) {
   );
 
   try {
-  return await fetch(
-    `${BLOG_URL}/api/blogs?status=published&${query}`
-  ).then<BlogsResponse>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    return await fetch(
+      `${BLOG_URL}/api/blogs?status=published&${query}`
+    ).then<BlogsResponse>(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return { data: [] } as unknown as BlogsResponse;
     throw new ApiError("No fue posible obtener los últimos blogs", 503);
@@ -1212,19 +1208,19 @@ export async function getBlogsByCategory(
   );
 
   try {
-  return await fetch(
-    `${BLOG_URL}/api/blogs/findByCategory?${query}`
-  ).then<BlogsResponse>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    return await fetch(
+      `${BLOG_URL}/api/blogs/findByCategory?${query}`
+    ).then<BlogsResponse>(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return { data: [] } as unknown as BlogsResponse;
     throw new ApiError("No fue posible obtener los blogs", 503);
@@ -1244,19 +1240,19 @@ export async function getBlogTopics(locale: string) {
     { encodeValuesOnly: true }
   );
   try {
-  return await fetch(
-    `${BLOG_URL}/api/tags?status=published&${query}`
-  ).then<BlogTopicsResponse>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    return await fetch(
+      `${BLOG_URL}/api/tags?status=published&${query}`
+    ).then<BlogTopicsResponse>(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return { data: [] } as unknown as BlogTopicsResponse;
     throw new ApiError("No fue posible obtener los temas del blog", 503);
@@ -1277,19 +1273,19 @@ export async function getBlogCategories(locale: string) {
   );
 
   try {
-  return await fetch(
-    `${BLOG_URL}/api/categories?status=published&${query}`
-  ).then<BlogCategoryResponse>(async (res) => {
-    if (res.ok) return await res.json();
-    try {
-      const data = await res.json();
-      if ("error" in data && typeof data.error === "string")
-        throw new ApiError(data.error as string, res.status);
-      else throw new ApiError("Error desconocido", res.status);
-    } catch {
-      throw new ApiError("Error desconocido", res.status);
-    }
-  });
+    return await fetch(
+      `${BLOG_URL}/api/categories?status=published&${query}`
+    ).then<BlogCategoryResponse>(async (res) => {
+      if (res.ok) return await res.json();
+      try {
+        const data = await res.json();
+        if ("error" in data && typeof data.error === "string")
+          throw new ApiError(data.error as string, res.status);
+        else throw new ApiError("Error desconocido", res.status);
+      } catch {
+        throw new ApiError("Error desconocido", res.status);
+      }
+    });
   } catch {
     if (isDevelopment) return { data: [] } as unknown as BlogCategoryResponse;
     throw new ApiError("No fue posible obtener las categorías del blog", 503);

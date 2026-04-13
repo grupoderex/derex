@@ -1,7 +1,7 @@
+import { WebsiteMedia } from "@/models/website_media";
 import { getMedia, getTitlesBySection } from "@/utils/api";
 import ReservasPage from "@/views/Reservas";
 import NotFound from "../not-found";
-import { WebsiteMedia } from "@/models/website_media";
 
 export default async function Page() {
   const homeTitles = await getTitlesBySection("home");
