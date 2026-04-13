@@ -46,7 +46,9 @@ import { ApiError } from "@/types/api_error";
 import qs from "qs";
 import { BACKEND_URL, BLOG_URL } from "../constants";
 
-const isDevelopment = process.env.NODE_ENV !== "production";
+const isDevelopment =
+  process.env.NODE_ENV !== "production" ||
+  process.env.NEXT_PHASE === "phase-production-build";
 
 export async function postLotesForm(formData: LotesFormData) {
   return await fetch(`${BACKEND_URL}/lotes-form/lotes`, {
