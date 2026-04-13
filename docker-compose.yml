@@ -4,11 +4,10 @@ services:
 
   # ─── Traefik (reverse proxy + TLS) ───────────────────────────────────────────
   traefik:
-    image: traefik:v3.0
+    image: traefik:v3.3
     restart: always
     environment:
-      DOCKER_HOST: "unix:///var/run/docker.sock"
-      DOCKER_API_VERSION: "${DOCKER_API_VERSION:-1.41}"
+      DOMAIN: ${DOMAIN}
     ports:
       - "80:80"
       - "443:443"
@@ -17,16 +16,12 @@ services:
       - "--log.level=INFO"
       - "--entrypoints.web.address=:80"
       - "--entrypoints.websecure.address=:443"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--providers.docker.network=web"
       - "--providers.file.directory=/etc/traefik/dynamic"
       - "--providers.file.watch=true"
       - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}"
       - "--certificatesresolvers.letsencrypt.acme.storage=/acme/acme.json"
       - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./traefik/dynamic:/etc/traefik/dynamic:ro
       - traefik-certs:/acme
     networks:
@@ -44,6 +39,8 @@ services:
         NEXT_PUBLIC_ENABLE_GOOGLE_MAPS_DEV: ${NEXT_PUBLIC_ENABLE_GOOGLE_MAPS_DEV:-false}
         SITE_URL: https://${DOMAIN}
     environment:
+      BACKEND_URL: http://backend:3000
+      BLOG_URL: http://blog:1337
       NEXT_PUBLIC_REACT_APP_GOOGLE_MAPS_KEY: ${NEXT_PUBLIC_REACT_APP_GOOGLE_MAPS_KEY}
       NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
       NEXT_PUBLIC_ENABLE_GOOGLE_MAPS_DEV: ${NEXT_PUBLIC_ENABLE_GOOGLE_MAPS_DEV:-false}

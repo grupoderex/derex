@@ -1,8 +1,13 @@
 import { Metadata } from "next";
 
-const baseUrl = process.env.SITE_URL ?? "";
+const siteUrl = (process.env.SITE_URL || "https://derexqa.online").replace(
+  /\/+$/,
+  ""
+);
+const baseUrl = `${siteUrl}/`;
 
 export const GLOBAL: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: "Inmobiliarias en México | Casas con Infonavit | JAVER",
   description:
     "Encuentra las mejores casas a los precios más accesibles con la seguridad y plusvalía para tu familia ¡Si piensas comprar una casa ven a Javer!",
@@ -33,9 +38,9 @@ export const GLOBAL: Metadata = {
 };
 
 export const HOME_META: Metadata = {
-  metadataBase: new URL("https://www.javer.com.mx"), //para links
+  metadataBase: new URL(siteUrl), // para links
   alternates: {
-    canonical: "https://www.javer.com.mx/",
+    canonical: `${siteUrl}/`,
   },
   title: "Casas en Venta en México | Encuentra tu Hogar Ideal con Javer",
   description:
@@ -54,7 +59,7 @@ export const HOME_META: Metadata = {
         alt: "Javer | Más de 50 Años Construyendo Patrimonio para las Familias Mexicanas",
       },
     ],
-    url: "https://www.javer.com.mx",
+    url: siteUrl,
     siteName: "Javer",
     type: "website",
   },

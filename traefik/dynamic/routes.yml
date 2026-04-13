@@ -1,0 +1,86 @@
+http:
+  routers:
+    # ── Frontend (apex + www) ─────────────────────────────────────────────────
+    frontend-http:
+      rule: 'Host(`{{ env "DOMAIN" }}`) || Host(`www.{{ env "DOMAIN" }}`)'
+      entrypoints: [web]
+      middlewares: [https-redirect]
+      service: frontend
+
+    frontend:
+      rule: 'Host(`{{ env "DOMAIN" }}`) || Host(`www.{{ env "DOMAIN" }}`)'
+      entrypoints: [websecure]
+      tls:
+        certResolver: letsencrypt
+      middlewares: [www-to-root]
+      service: frontend
+
+    # ── Backend API ───────────────────────────────────────────────────────────
+    backend-http:
+      rule: 'Host(`api.{{ env "DOMAIN" }}`)'
+      entrypoints: [web]
+      middlewares: [https-redirect]
+      service: backend
+
+    backend:
+      rule: 'Host(`api.{{ env "DOMAIN" }}`)'
+      entrypoints: [websecure]
+      tls:
+        certResolver: letsencrypt
+      service: backend
+
+    # ── Admin panel ───────────────────────────────────────────────────────────
+    admin-http:
+      rule: 'Host(`admin.{{ env "DOMAIN" }}`)'
+      entrypoints: [web]
+      middlewares: [https-redirect]
+      service: admin
+
+    admin:
+      rule: 'Host(`admin.{{ env "DOMAIN" }}`)'
+      entrypoints: [websecure]
+      tls:
+        certResolver: letsencrypt
+      service: admin
+
+    # ── Blog (Strapi) ─────────────────────────────────────────────────────────
+    blog-http:
+      rule: 'Host(`blog.{{ env "DOMAIN" }}`)'
+      entrypoints: [web]
+      middlewares: [https-redirect]
+      service: blog
+
+    blog:
+      rule: 'Host(`blog.{{ env "DOMAIN" }}`)'
+      entrypoints: [websecure]
+      tls:
+        certResolver: letsencrypt
+      service: blog
+
+  middlewares:
+    www-to-root:
+      redirectRegex:
+        regex: '^https://www\.(.+)'
+        replacement: 'https://${1}'
+        permanent: true
+
+  services:
+    frontend:
+      loadBalancer:
+        servers:
+          - url: 'http://frontend:3000'
+
+    backend:
+      loadBalancer:
+        servers:
+          - url: 'http://backend:3000'
+
+    admin:
+      loadBalancer:
+        servers:
+          - url: 'http://admin:80'
+
+    blog:
+      loadBalancer:
+        servers:
+          - url: 'http://blog:1337'
