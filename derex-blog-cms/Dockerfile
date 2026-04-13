@@ -6,7 +6,7 @@ WORKDIR /opt/app
 RUN apk add --no-cache python3 make g++ sqlite-dev
 
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN if [ -f package-lock.json ]; then npm ci || npm install; else npm install; fi
 
 COPY . .
 
