@@ -68,7 +68,7 @@ function Home({
       const currDistance = projects.reduce((prev, curr) => {
         const distance = Math.sqrt(
           Math.pow(parseFloat(curr.latitud) - coords.lat, 2) +
-            Math.pow(parseFloat(curr.longitud) - coords.lon, 2)
+          Math.pow(parseFloat(curr.longitud) - coords.lon, 2)
         );
         return distance < prev ? distance : prev;
       }, Infinity);
@@ -125,7 +125,7 @@ function Home({
       const currDistance = projects.reduce((prev, curr) => {
         const distance = Math.sqrt(
           Math.pow(parseFloat(curr.latitud) - coords.lat, 2) +
-            Math.pow(parseFloat(curr.longitud) - coords.lon, 2)
+          Math.pow(parseFloat(curr.longitud) - coords.lon, 2)
         );
         return distance < prev ? distance : prev;
       }, Infinity);
@@ -149,6 +149,9 @@ function Home({
     }
   }, [nearestFeaturedState, developments]);
 
+  const homeMediaUrl = websiteMedia?.home_video ?? "";
+  const isHomeMediaVideo = /\.(mp4|webm|ogg)(\?.*)?$/i.test(homeMediaUrl);
+
   return (
     <div className="mt-[-78px] lg:mt-[-95px] pb-32">
       <div className="relative">
@@ -163,29 +166,29 @@ function Home({
             quality={80}
           />
         </div>
-        {/* {websiteMedia?.home_video ? (
+        {homeMediaUrl && isHomeMediaVideo ? (
           <video
             autoPlay
             loop
             muted
             playsInline
-            src={websiteMedia.home_video}
+            src={homeMediaUrl}
             aria-hidden="true"
             tabIndex={-1}
             className="object-cover w-full h-[80vh] lg:h-[70vh]"
-            aria-label="Video de la página de inicio"
+            aria-label="Video de la pagina de inicio"
           />
-        ) : null} */}
-{websiteMedia?.home_video ? (
-  <Image
-    src={websiteMedia.home_video}
-    alt="Imagen de la página de inicio"
-    width={1920}
-    height={1080}
-    className="object-cover w-full h-[80vh] lg:h-[70vh]"
-    priority
-  />
-) : null}
+        ) : null}
+        {homeMediaUrl && !isHomeMediaVideo ? (
+          <Image
+            src={homeMediaUrl}
+            alt="Imagen de la pagina de inicio"
+            width={1920}
+            height={1080}
+            className="object-cover w-full h-[80vh] lg:h-[70vh]"
+            priority
+          />
+        ) : null}
 
         <div className="absolute -bottom-1 h-[80vh] w-full home-gradient" />
 
@@ -201,16 +204,16 @@ function Home({
               <div className="absolute top-full left-0 w-full flex justify-center mt-4">
                 {(permissionStatus === "prompt" ||
                   permissionStatus === "unknown") && (
-                  <Button
-                    onClick={() => requestPosition(true)}
-                    variant="secondary"
-                    className="gap-2 shadow-lg bg-white/90 hover:bg-white text-primary font-bold animate-in fade-in slide-in-from-top-2"
-                    size="sm"
-                  >
-                    <Icon icon="heroicons:map-pin" width="20" />
-                    {t("findNearMe") ?? "Ver desarrollos cerca de mí"}
-                  </Button>
-                )}
+                    <Button
+                      onClick={() => requestPosition(true)}
+                      variant="secondary"
+                      className="gap-2 shadow-lg bg-white/90 hover:bg-white text-primary font-bold animate-in fade-in slide-in-from-top-2"
+                      size="sm"
+                    >
+                      <Icon icon="heroicons:map-pin" width="20" />
+                      {t("findNearMe") ?? "Ver desarrollos cerca de mí"}
+                    </Button>
+                  )}
               </div>
             </div>
           </div>
@@ -253,11 +256,10 @@ function Home({
               {featuredDevelopments.map((d) => (
                 <Button
                   key={d.id}
-                  className={`bg-neutral-300/20 text-neutral-700 px-4 py-3 font-roboto ${
-                    selectedState === d.id
-                      ? "bg-primary text-white border-b-2 border-primary"
-                      : ""
-                  }`}
+                  className={`bg-neutral-300/20 text-neutral-700 px-4 py-3 font-roboto ${selectedState === d.id
+                    ? "bg-primary text-white border-b-2 border-primary"
+                    : ""
+                    }`}
                   onClick={() => {
                     setSelectedState(d.id);
                   }}
@@ -293,11 +295,10 @@ function Home({
       </section>
 
       <section
-        className={`lg:h-[480px] flex flex-col gap-8 my-8  xl:max-w-[1700px] mx-0 px-8 w-full ${
-          knowJaver?.isImageLeft === "true"
-            ? "lg:flex-row"
-            : "lg:flex-row-reverse"
-        }`}
+        className={`lg:h-[480px] flex flex-col gap-8 my-8  xl:max-w-[1700px] mx-0 px-8 w-full ${knowJaver?.isImageLeft === "true"
+          ? "lg:flex-row"
+          : "lg:flex-row-reverse"
+          }`}
       >
         <div className="relative lg:w-1/2 h-auto aspect-[16/9]">
           <Image

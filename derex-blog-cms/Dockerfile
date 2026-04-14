@@ -33,8 +33,8 @@ COPY --from=builder /opt/app/node_modules ./node_modules
 # Copy build artifacts and source required at runtime
 COPY --from=builder /opt/app/dist       ./dist
 COPY --from=builder /opt/app/public     ./public
-COPY --from=builder /opt/app/config     ./config
-COPY --from=builder /opt/app/src        ./src
+COPY --from=builder /opt/app/dist/config ./config
+COPY --from=builder /opt/app/dist/src    ./src
 COPY --from=builder /opt/app/types      ./types
 COPY --from=builder /opt/app/scripts    ./scripts
 COPY --from=builder /opt/app/package.json ./

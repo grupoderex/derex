@@ -31,6 +31,7 @@ services:
   frontend:
     build:
       context: ./derex-frontend-main
+      network: host
       args:
         NEXT_PUBLIC_REACT_APP_BACKEND_URL: https://api.${DOMAIN}
         NEXT_PUBLIC_REACT_APP_BLOG_URL: https://blog.${DOMAIN}

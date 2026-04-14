@@ -57,6 +57,18 @@ Import into QA:
 ./deploy-qa.sh --import /path/to/derex.sql /path/to/derex_strapi.sql
 ```
 
+Import into QA and sync backend uploads volume:
+
+```bash
+./deploy-qa.sh --import /path/to/derex.sql /path/to/derex_strapi.sql --sync-uploads /path/to/uploads-local-backup
+```
+
+Force uploads sync even when target volume is not empty:
+
+```bash
+./deploy-qa.sh --sync-uploads /path/to/uploads-local-backup --force-uploads
+```
+
 Import into PROD:
 
 ```bash

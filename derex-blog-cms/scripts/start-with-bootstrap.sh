@@ -5,6 +5,15 @@ APP_CMD="${APP_CMD:-start}"
 BOOTSTRAP_ONETIME="${STRAPI_BOOTSTRAP_ADMIN_ONETIME:-false}"
 BOOTSTRAP_MARKER_FILE="${STRAPI_BOOTSTRAP_ADMIN_MARKER_FILE:-/opt/app/public/uploads/.strapi-admin-bootstrap-done}"
 
+prepare_runtime_config() {
+  if [ -d "/opt/app/dist/config" ]; then
+    mkdir -p /opt/app/config
+    rm -f /opt/app/config/*.ts
+    cp -f /opt/app/dist/config/*.js /opt/app/config/
+    echo "[strapi-bootstrap] Runtime config prepared from dist/config"
+  fi
+}
+
 bootstrap_admin() {
   if [ -z "${STRAPI_BOOTSTRAP_ADMIN_EMAIL:-}" ] || [ -z "${STRAPI_BOOTSTRAP_ADMIN_PASSWORD:-}" ] || [ -z "${STRAPI_BOOTSTRAP_ADMIN_FIRSTNAME:-}" ] || [ -z "${STRAPI_BOOTSTRAP_ADMIN_LASTNAME:-}" ]; then
     echo "[strapi-bootstrap] Admin bootstrap vars missing; skipping admin bootstrap"
@@ -51,6 +60,8 @@ bootstrap_admin() {
   echo "[strapi-bootstrap] Admin likely already exists (or creation failed). Continuing startup."
   return 0
 }
+
+prepare_runtime_config
 
 bootstrap_admin
 

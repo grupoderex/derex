@@ -190,7 +190,7 @@ export async function getContratosAdhesion() {
 export async function getWebsiteMedia() {
   try {
     return await fetch(`${BACKEND_URL}/estilos`, {
-      next: { revalidate: 3600 }, // ISR: Cache 1 hora - Media del sitio (videos, imágenes) cambia raramente
+      next: { revalidate: 300 }, // ISR: Cache 5 minutos - Media del sitio no requiere reflejo inmediato
     })
       .then<WebsiteMedia[]>(async (res) => {
         if (res.ok) return await res.json();
@@ -231,7 +231,7 @@ export async function getWebsiteMedia() {
 export async function getMedia() {
   try {
     const response = await fetch(`${BACKEND_URL}/estilos`, {
-      next: { revalidate: 3600 }, // ISR: Cache 1 hora - Media del sitio cambia raramente
+      next: { revalidate: 300 }, // ISR: Cache 5 minutos - Media del sitio no requiere reflejo inmediato
     });
     return await response.json();
   } catch {
@@ -243,7 +243,7 @@ export async function getMedia() {
 export async function getFullDataDesarrollos() {
   try {
     return await fetch(`${BACKEND_URL}/location/location_hierarchy/formatted`, {
-      next: { revalidate: 600 }, // ISR: Cache 10 minutos - Desarrollos se actualizan periódicamente
+      cache: "no-store", // Reflejo inmediato para cambios de proyectos/propiedades
     }).then<ResponseFormatted>(async (res) => {
       if (res.ok) return await res.json();
       try {
@@ -420,7 +420,10 @@ export async function setFavoritesUserAPI(token: string, propertyId: number) {
 export async function getProjectByID(id: number, showHidden: boolean = false) {
   try {
     return await fetch(
-      `${BACKEND_URL}/proyectos/id/${id}?show_invisible=${showHidden}`
+      `${BACKEND_URL}/proyectos/id/${id}?show_invisible=${showHidden}`,
+      {
+        cache: "no-store", // Reflejo inmediato para cambios de proyectos
+      }
     ).then<Project>(async (res) => {
       if (res.ok) return await res.json();
       try {
@@ -462,7 +465,7 @@ export async function getFileByName(name: string) {
 export async function getProjects(showHidden: boolean = false): Promise<Project[]> {
   try {
     return await fetch(`${BACKEND_URL}/proyectos?show_invisible=${showHidden}`, {
-      next: { revalidate: 600 }, // ISR: Cache 10 minutos - Lista de proyectos se actualiza periódicamente
+      cache: "no-store", // Reflejo inmediato para cambios de proyectos
     }).then<Project[]>(async (res) => {
       if (res.ok) return await res.json();
       try {
@@ -532,7 +535,10 @@ export async function getPropertiesSearch({
   try {
     return await fetch(
       `${BACKEND_URL}/propiedades/properties_search?${stateId ? "state=" + stateId : "project=" + projectId
-      }${type ? `&type=${type}` : ""}&show_invisible=${showHidden}`
+      }${type ? `&type=${type}` : ""}&show_invisible=${showHidden}`,
+      {
+        cache: "no-store", // Reflejo inmediato para cambios de propiedades
+      }
     )
       .then<PropertySearch[]>(async (res) => {
         if (res.ok) return await res.json();
@@ -573,7 +579,10 @@ export async function getPropertiesSearch({
 export async function getPropertyById(id: number, showHidden: boolean = false) {
   try {
     return await fetch(
-      `${BACKEND_URL}/propiedades/id/${id}?show_invisible=${showHidden}`
+      `${BACKEND_URL}/propiedades/id/${id}?show_invisible=${showHidden}`,
+      {
+        cache: "no-store", // Reflejo inmediato para cambios de propiedades
+      }
     ).then<Property>(async (res) => {
       if (res.ok) return await res.json();
       try {
@@ -936,9 +945,8 @@ export async function getClientExperienceById(id: number) {
 }
 
 export async function getAllAboutSections() {
-  const fetchAboutUs = async (url: string, cacheMode: RequestCache = "default") => {
+  const fetchAboutUs = async (url: string, cacheMode: RequestCache = "no-store") => {
     return await fetch(url, {
-      next: { revalidate: 3600 }, // ISR: Cache 1 hora - Secciones "Nosotros" cambian raramente
       cache: cacheMode,
     }).then<AboutSectionListResponse>(async (res) => {
       if (res.ok) return await res.json();
