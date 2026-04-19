@@ -1,0 +1,82 @@
+http:
+  routers:
+    javerqa-frontend-http:
+      rule: 'Host(`javerqa.online`) || Host(`www.javerqa.online`)'
+      entrypoints: [web]
+      middlewares: [https-redirect]
+      service: javerqa-frontend
+
+    javerqa-frontend:
+      rule: 'Host(`javerqa.online`) || Host(`www.javerqa.online`)'
+      entrypoints: [websecure]
+      tls:
+        certResolver: letsencrypt
+      middlewares: [javerqa-www-to-root]
+      service: javerqa-frontend
+
+    javerqa-backend-http:
+      rule: 'Host(`api.javerqa.online`)'
+      entrypoints: [web]
+      middlewares: [https-redirect]
+      service: javerqa-backend
+
+    javerqa-backend:
+      rule: 'Host(`api.javerqa.online`)'
+      entrypoints: [websecure]
+      tls:
+        certResolver: letsencrypt
+      service: javerqa-backend
+
+    javerqa-admin-http:
+      rule: 'Host(`admin.javerqa.online`)'
+      entrypoints: [web]
+      middlewares: [https-redirect]
+      service: javerqa-admin
+
+    javerqa-admin:
+      rule: 'Host(`admin.javerqa.online`)'
+      entrypoints: [websecure]
+      tls:
+        certResolver: letsencrypt
+      service: javerqa-admin
+
+    javerqa-blog-http:
+      rule: 'Host(`blog.javerqa.online`)'
+      entrypoints: [web]
+      middlewares: [https-redirect]
+      service: javerqa-blog
+
+    javerqa-blog:
+      rule: 'Host(`blog.javerqa.online`)'
+      entrypoints: [websecure]
+      tls:
+        certResolver: letsencrypt
+      service: javerqa-blog
+
+  middlewares:
+    javerqa-www-to-root:
+      redirectRegex:
+        regex: '^https://www\.(.+)'
+        replacement: 'https://${1}'
+        permanent: true
+
+  services:
+    javerqa-frontend:
+      loadBalancer:
+        servers:
+          - url: 'http://javerqa-frontend-1:3000'
+
+    javerqa-backend:
+      loadBalancer:
+        servers:
+          - url: 'http://javerqa-backend-1:3000'
+
+    javerqa-admin:
+      loadBalancer:
+        servers:
+          - url: 'http://javerqa-admin-1:80'
+
+    javerqa-blog:
+      loadBalancer:
+        servers:
+          - url: 'http://javerqa-blog-1:1337'

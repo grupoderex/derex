@@ -40,14 +40,15 @@ services:
         NEXT_PUBLIC_ENABLE_GOOGLE_MAPS_DEV: ${NEXT_PUBLIC_ENABLE_GOOGLE_MAPS_DEV:-false}
         SITE_URL: https://${DOMAIN}
     environment:
-      BACKEND_URL: http://backend:3000
-      BLOG_URL: http://blog:1337
+      BACKEND_URL: http://derex-backend:3000
+      BLOG_URL: http://derex-blog:1337
       NEXT_PUBLIC_REACT_APP_GOOGLE_MAPS_KEY: ${NEXT_PUBLIC_REACT_APP_GOOGLE_MAPS_KEY}
       NEXT_PUBLIC_RECAPTCHA_SITE_KEY: ${NEXT_PUBLIC_RECAPTCHA_SITE_KEY}
       NEXT_PUBLIC_ENABLE_GOOGLE_MAPS_DEV: ${NEXT_PUBLIC_ENABLE_GOOGLE_MAPS_DEV:-false}
     restart: always
     networks:
       - web
+      - internal
     labels:
       - "traefik.enable=true"
       # HTTP → HTTPS redirect
@@ -97,8 +98,10 @@ services:
       RECAPTCHA_SECRET_KEY: ${RECAPTCHA_SECRET_KEY}
       RECAPTCHA_BYPASS: ${RECAPTCHA_BYPASS:-false}
     networks:
-      - web
-      - internal
+      web:
+      internal:
+        aliases:
+          - derex-backend
     depends_on:
       mysql:
         condition: service_healthy
@@ -161,8 +164,10 @@ services:
       DATABASE_PASSWORD: ${MYSQL_PASSWORD}
       DATABASE_SSL: "false"
     networks:
-      - web
-      - internal
+      web:
+      internal:
+        aliases:
+          - derex-blog
     depends_on:
       mysql:
         condition: service_healthy

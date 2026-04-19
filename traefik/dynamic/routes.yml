@@ -68,19 +68,19 @@ http:
     frontend:
       loadBalancer:
         servers:
-          - url: 'http://frontend:3000'
+          - url: 'http://derex-frontend-1:3000'
 
     backend:
       loadBalancer:
         servers:
-          - url: 'http://backend:3000'
+          - url: 'http://derex-backend-1:3000'
 
     admin:
       loadBalancer:
         servers:
-          - url: 'http://admin:80'
+          - url: 'http://derex-admin-1:80'
 
     blog:
       loadBalancer:
         servers:
-          - url: 'http://blog:1337'
+          - url: 'http://derex-blog-1:1337'
