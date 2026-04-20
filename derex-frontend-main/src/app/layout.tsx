@@ -5,9 +5,9 @@ import { WhatsappFAB } from "@/components/WhatsappFAB";
 import { Providers } from "@/context/Providers";
 import { nunitoSansFont, robotoFont } from "@/lib/fonts";
 import {
-    getActiveSections,
-    getInitialDataDesarrollos,
-    getWebsiteMedia,
+  getActiveSections,
+  getInitialDataDesarrollos,
+  getWebsiteMedia,
 } from "@/utils/api";
 import { GLOBAL } from "@/utils/metaTags";
 import type { Metadata } from "next";
@@ -54,7 +54,7 @@ export default async function RootLayout({
 
           <UiVisibilityWrapper>
             <Footer
-              // initialData={sectionsData?.footer ?? initialFooterSections}
+            // initialData={sectionsData?.footer ?? initialFooterSections}
             />
           </UiVisibilityWrapper>
 
@@ -63,7 +63,7 @@ export default async function RootLayout({
         </Providers>
       </body>
 
-      <GoogleTagManager gtmId="GTM-TZ9T64V" />
+      <GoogleTagManager gtmId="GTM-NX53S2WR" />
     </html>
   );
 }
