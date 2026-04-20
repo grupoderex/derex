@@ -77,13 +77,13 @@ export default function AllProjects () {
     setFilterName(event.target.value);
   };
 
-  const fArray = data?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const projects = Array.isArray(data) ? data : [];
+  const fArray = projects.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
   let filteredProjects = [];
   const s = stripAccents(filterName);
   if (filterName.length > 0) {
-    for (let i = 0; i < data?.length; i += 1) {
-      if (!data) break;
-      const item = data[i];
+    for (let i = 0; i < projects.length; i += 1) {
+      const item = projects[i];
       if (stripAccents(item.name).indexOf(s) !== -1) filteredProjects.push(item);
     }
   } else {
@@ -148,7 +148,7 @@ export default function AllProjects () {
             <TablePagination
               page={page}
               component="div"
-              count={data?.length || 0}
+              count={projects.length}
               rowsPerPage={rowsPerPage}
               onPageChange={handleChangePage}
               rowsPerPageOptions={[5, 10, 25]}

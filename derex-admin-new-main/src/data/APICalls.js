@@ -141,7 +141,9 @@ export const api_updateDocument = async (id, newData, token) => {
 
 export const api_getAllProjects = async () => {
   const { data } = await apiService.get('/proyectos?show_invisible=true');
-  return data;
+  if (Array.isArray(data)) return data;
+  if (Array.isArray(data?.data)) return data.data;
+  return [];
 };
 
 export const api_getProjectById = async (id) => {
