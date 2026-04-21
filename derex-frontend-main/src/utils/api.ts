@@ -264,7 +264,7 @@ export async function getFullDataDesarrollos() {
 export async function getInitialDataDesarrollos(): Promise<LocationHierarchy[]> {
   try {
     return await fetch(`${BACKEND_URL}/location/location_hierarchy`, {
-      next: { revalidate: 200 }, // ISR: Cache 200 segundos - Jerarquía de ubicaciones se actualiza periódicamente
+      cache: "no-store", // Reflejo inmediato para cambios de proyectos y miniaturas
     }).then<LocationHierarchy[]>(async (res) => {
       if (res.ok) return await res.json();
       if (isDevelopment) return [];

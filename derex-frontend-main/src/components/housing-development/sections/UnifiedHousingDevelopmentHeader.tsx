@@ -60,8 +60,8 @@ export function UnifiedHousingDevelopmentHeader({
   const hasBackgroundMedia = !!development?.video_url?.trim();
   const backgroundMediaIsImage = isImageBackground(development?.video_url);
   const mediaSectionHeightClass = hasBackgroundMedia
-    ? "h-64 lg:h-[70vh]"
-    : "h-[500px] lg:h-[600px]";
+    ? "h-[65vh] lg:h-[70vh]"
+    : "h-[65vh] lg:h-[600px]";
 
   const defaultImage = "/images/thumbnail.webp";
 
@@ -123,7 +123,6 @@ export function UnifiedHousingDevelopmentHeader({
             loop
             muted
             playsInline
-            width="100%"
             aria-label={`Video del desarrollo ${development?.name}`}
           />
         )}
@@ -137,7 +136,7 @@ export function UnifiedHousingDevelopmentHeader({
 
         {/* Content Container */}
         <div
-          className={`lg:absolute bottom-0 left-0 w-full flex flex-col gap-8 -mt-16 lg:mt-0 [&>*]:z-20 ${!isVertical ? "lg:items-center" : ""
+          className={`absolute bottom-0 left-0 w-full flex flex-col gap-8 [&>*]:z-20 ${!isVertical ? "lg:items-center" : ""
             }`}
         >
           <div className="flex flex-col gap-8">
@@ -152,8 +151,8 @@ export function UnifiedHousingDevelopmentHeader({
             {/* Logo + Title + Location */}
             <div
               className={`flex flex-col lg:flex-row lg:items-center gap-6 ${isVertical
-                  ? "container"
-                  : "max-lg:container container-responsive"
+                ? "container"
+                : "max-lg:container container-responsive"
                 }`}
             >
               {/* Logo */}
@@ -205,8 +204,8 @@ export function UnifiedHousingDevelopmentHeader({
       {/* CONTENT SECTION */}
       <section
         className={`mt-4 flex flex-col  ${isVertical
-            ? "container"
-            : "lg:items-center xl:max-w-5xl lg:mx-auto max-lg:container container-responsive"
+          ? "container"
+          : "lg:items-center xl:max-w-5xl lg:mx-auto max-lg:container container-responsive"
           }`}
       >
         {/* Presale Badge (mobile) */}

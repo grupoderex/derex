@@ -68,6 +68,10 @@ const nextConfig: NextConfig = {
         protocol: "https",
         hostname: blogHostname,
       },
+      {
+        protocol: "https",
+        hostname: "**.r2.dev",
+      },
     ],
   },
   async rewrites() {

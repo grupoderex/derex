@@ -809,7 +809,11 @@ export const api_upsertKnowJaver = async (knowJaver, token) => {
         ? {
           section: 'meet-javer',
           name: key,
-          value: value?.toString(),
+          value: value?.toString() ?? '',
+          value_en: '',
+          bold: false,
+          outline: false,
+          color: false,
         }
         : {
           ...value,

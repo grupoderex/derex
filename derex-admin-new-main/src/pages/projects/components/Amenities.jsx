@@ -167,13 +167,15 @@ export const Amenities = ({ id, onAmenitiesChanges, isOnlyImage = false }) => {
       };
 
       const { data: response } = await api_createAmenity(body, dataAuth.token);
+      const createdAmenityId =
+        typeof response === 'number' ? response : response?.id ?? response?.[0];
 
       toast.success('Nueva amenidad agregada');
 
       setAmenitiesArray((prevState) => [
         ...prevState,
         {
-          id: response[0],
+          id: createdAmenityId,
           name: amenity.name || undefined,
           img_url: amenity.img_url || undefined,
           name_eng: amenity.name_eng || undefined,
@@ -196,7 +198,7 @@ export const Amenities = ({ id, onAmenitiesChanges, isOnlyImage = false }) => {
     const confirmed = window.confirm('¿Seguro que deseas eliminar esta amenidad?');
     if (!confirmed) return;
 
-    if (id === 'new') {
+    if (id === 'new' || !amenityToDelete?.id) {
       const updatedFormState = amenitiesArray.filter((v, index2) => index !== index2);
 
       setAmenitiesArray((prevState) => prevState.filter((v, index2) => index !== index2));
