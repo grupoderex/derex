@@ -39,9 +39,8 @@ export function PropertyHeader({
   return (
     <>
       <section
-        className={`relative transition-all duration-300 ease-in overflow-hidden ${
-          !property?.main_image?.trim() ? "max-h-96" : "max-h-screen"
-        }`}
+        className={`relative transition-all duration-300 ease-in overflow-hidden ${!property?.main_image?.trim() ? "max-h-96" : "max-h-screen"
+          }`}
       >
         {property?.main_image && getResourceUrl(property.main_image) && (
           <Image
@@ -83,7 +82,7 @@ export function PropertyHeader({
                       style: "currency",
                       currency: "MXN",
                       minimumFractionDigits: 0,
-                      maximumFractionDigits: 0,                      
+                      maximumFractionDigits: 0,
                     }).format(lowestPrice)}
                   </h3>
                   <Dialog>

@@ -1,9 +1,19 @@
 "use client";
+import Favorites from "@/components/Favourites";
 import { type LocationHierarchy } from "@/models/location_hierarchy";
 import { toUrlCase } from "@/utils/common.utils";
+import { Icon } from "@iconify/react";
 import { ChevronRight } from "lucide-react";
-import { useTranslation } from "react-i18next";
 import Link from "next/link";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import { DesktopMenuLink } from "./DesktopMenuLink";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "./ui/accordion";
 import { Button } from "./ui/button";
 import {
   NavigationMenu,
@@ -11,16 +21,6 @@ import {
   NavigationMenuLink,
   NavigationMenuList,
 } from "./ui/navigation-menu";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "./ui/accordion";
-import Favorites from "@/components/Favourites";
-import { useState } from "react";
-import { DesktopMenuLink } from "./DesktopMenuLink";
-import { Icon } from "@iconify/react";
 
 import { useAuthStore } from "@/stores/useAuthStore";
 
@@ -107,9 +107,8 @@ export function MobileMenu({
 
                             setSelectedCity(null);
                           }}
-                          className={`transition-all text-foreground-soft text-base  px-4 py-2 cursor-pointer flex flex-row justify-between items-center font-display font-extrabold lg:font-normal ${
-                            selectedState === item.id ? "!text-accent" : ""
-                          }`}
+                          className={`transition-all text-foreground-soft text-base  px-4 py-2 cursor-pointer flex flex-row justify-between items-center font-display font-extrabold lg:font-normal ${selectedState === item.id ? "!text-accent" : ""
+                            }`}
                         >
                           {item.name}
                           <ChevronRight className="h-6 w-6 inline-block" />
@@ -144,9 +143,8 @@ export function MobileMenu({
                               setSelectedCity(item.id);
                             }
                           }}
-                          className={`transition-all text-foreground-soft font-display text-base px-4 py-2 cursor-pointer flex flex-row justify-between items-center font-extrabold lg:font-normal ${
-                            selectedCity === item.id ? "!text-accent" : ""
-                          }`}
+                          className={`transition-all text-foreground-soft font-display text-base px-4 py-2 cursor-pointer flex flex-row justify-between items-center font-extrabold lg:font-normal ${selectedCity === item.id ? "!text-accent" : ""
+                            }`}
                         >
                           {item.name}
                           <ChevronRight className="h-8 w-8 inline-block" />
