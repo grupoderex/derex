@@ -112,6 +112,23 @@ Create A records pointing to your VPS public IP:
 - `docker logs --tail 200 <service>`
 - Test URLs for frontend, api, admin, and blog over HTTPS.
 
+### G) Forzar actualización del caché del frontend (Next.js ISR)
+Cuando se hacen cambios en la base de datos (ej. navbar, footer, contenidos) y se quiere ver el resultado de inmediato sin esperar 1 hora (TTL del caché ISR):
+
+**QA:**
+```bash
+docker exec derex-frontend-1 sh -c "find /app/.next/cache/fetch-cache -type f -delete 2>/dev/null; echo 'Cache cleared'" \
+  && docker compose --env-file .env.qa restart frontend
+```
+
+**PROD:**
+```bash
+docker exec derex-frontend-1 sh -c "find /app/.next/cache/fetch-cache -type f -delete 2>/dev/null; echo 'Cache cleared'" \
+  && docker compose --env-file .env.prod restart frontend
+```
+
+> **Nota:** El frontend usa ISR (`revalidate: 3600`) para cachear datos como navbar/footer. Un simple `restart` NO borra el caché en disco — hay que borrar los archivos en `.next/cache/fetch-cache` primero.
+
 ## Notes
 - No domain is hardcoded in compose routing; domains come from `${DOMAIN}`.
 - Next.js and Vite public URLs are injected at build time via compose build args.

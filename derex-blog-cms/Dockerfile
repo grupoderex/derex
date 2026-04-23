@@ -15,6 +15,10 @@ ENV NODE_ENV=production
 # Build Strapi admin panel; also ensures dist/ is generated for TypeScript src
 RUN npm run build && mkdir -p dist
 
+# Keep a copy in Strapi's package fallback path used by some runtime resolutions
+RUN mkdir -p node_modules/@strapi/admin/dist/server/server/build \
+	&& cp -r dist/build/* node_modules/@strapi/admin/dist/server/server/build/
+
 # Prune devDependencies before copying to next stage
 RUN npm prune --omit=dev
 
@@ -38,6 +42,7 @@ COPY --from=builder /opt/app/dist/src    ./src
 COPY --from=builder /opt/app/types      ./types
 COPY --from=builder /opt/app/scripts    ./scripts
 COPY --from=builder /opt/app/package.json ./
+COPY --from=builder /opt/app/favicon.png ./favicon.png
 
 # Ensure uploads directory exists for the named volume mount
 RUN mkdir -p public/uploads

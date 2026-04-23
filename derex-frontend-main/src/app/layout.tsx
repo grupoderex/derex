@@ -14,7 +14,6 @@ import type { Metadata } from "next";
 import { ToastContainer } from "react-toastify";
 import "./globals.css";
 // import { ChatWidget } from "@/components/ChatWidget";
-import LoginModal from "@/components/LoginModal";
 import { GoogleTagManager } from "@next/third-parties/google";
 
 export const metadata: Metadata = GLOBAL;
@@ -59,7 +58,6 @@ export default async function RootLayout({
           </UiVisibilityWrapper>
 
           {/* <ChatWidget /> */}
-          <LoginModal />
         </Providers>
       </body>
 

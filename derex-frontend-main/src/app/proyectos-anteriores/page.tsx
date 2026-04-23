@@ -30,13 +30,13 @@ export default async function Page() {
 
     return (
       <PreviousProjectsPage
-        title="Proyectos anteriores"
+        title="Proyectos concluidos"
         projects={previousProjects}
         projectImagesById={projectImagesById}
       />
     );
   } catch (error) {
-    console.error("Error al cargar proyectos anteriores:", error);
-    return <PreviousProjectsPage title="Proyectos anteriores" projects={[]} />;
+    console.error("Error al cargar proyectos concluidos:", error);
+    return <PreviousProjectsPage title="Proyectos concluidos" projects={[]} />;
   }
 }

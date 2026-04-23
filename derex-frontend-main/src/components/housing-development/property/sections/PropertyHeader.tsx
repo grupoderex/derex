@@ -12,8 +12,6 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-scroll";
 
 import { useFavorites, useToggleFavorite } from "@/hooks/useAppQueries";
-import { useAuthStore } from "@/stores/useAuthStore";
-import { useUIStore } from "@/stores/useUIStore";
 
 interface PropertyHeaderProps {
   project?: Project;
@@ -28,10 +26,6 @@ export function PropertyHeader({
 }: PropertyHeaderProps) {
   const { t } = useTranslation("translations");
 
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-
-  const openLogin = useUIStore((state) => state.openLogin);
-
   const { data: favoritesData } = useFavorites();
 
   const { mutate: toggleFavorite, isPending } = useToggleFavorite();
@@ -40,14 +34,6 @@ export function PropertyHeader({
     () => favoritesData?.favorites?.some((fav) => fav.id === property?.id),
     [favoritesData, property]
   );
-
-  const handleFavoriteClick = () => {
-    if (isAuthenticated) {
-      toggleFavorite(property?.id ?? 0);
-    } else {
-      openLogin();
-    }
-  };
 
 
   return (

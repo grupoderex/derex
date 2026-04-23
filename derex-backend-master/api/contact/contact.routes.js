@@ -11,8 +11,11 @@ const {
   projectFormSchema,
 } = require("./contact.schemas");
 
-const DEREX_CONTACT_EMAIL = "reno7882@gmail.com";
-const DEREX_CONTACT_CC = ["rct@javer.com.mx"];
+const DEREX_CONTACT_EMAIL = process.env.CONTACT_EMAIL_TO || "reno7882@gmail.com";
+const DEREX_CONTACT_CC = (process.env.CONTACT_EMAIL_CC || "rct@javer.com.mx")
+  .split(",")
+  .map((e) => e.trim())
+  .filter(Boolean);
 
 function ensureEmailConfig () {
   assertEmailConfig();

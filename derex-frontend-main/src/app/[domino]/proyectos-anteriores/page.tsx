@@ -38,16 +38,16 @@ export default async function Page({ params }: PageProps) {
 
     return (
       <PreviousProjectsPage
-        title={`Proyectos anteriores de ${domino.replace(/-/g, " ")}`}
+        title={`Proyectos concluidos de ${domino.replace(/-/g, " ")}`}
         projects={previousProjects}
         projectImagesById={projectImagesById}
       />
     );
   } catch (error) {
-    console.error("Error al cargar proyectos anteriores:", error);
+    console.error("Error al cargar proyectos concluidos:", error);
     return (
       <PreviousProjectsPage
-        title={`Proyectos anteriores de ${domino.replace(/-/g, " ")}`}
+        title={`Proyectos concluidos de ${domino.replace(/-/g, " ")}`}
         projects={[]}
       />
     );

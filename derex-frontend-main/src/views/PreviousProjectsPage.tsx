@@ -31,7 +31,7 @@ function normalizeAmenityImageUrl(url?: string): string | undefined {
 }
 
 export default function PreviousProjectsPage({
-  title = "Proyectos Anteriores",
+  title = "Proyectos Concluidos",
   projects,
   projectImagesById = {},
 }: PreviousProjectsPageProps) {
@@ -46,7 +46,7 @@ export default function PreviousProjectsPage({
 
       {projects.length === 0 && (
         <div className="rounded-xl border border-dashed border-border bg-neutral-50 p-12 text-center">
-          <p className="font-display text-2xl font-bold">Sin proyectos anteriores para mostrar</p>
+          <p className="font-display text-2xl font-bold">Sin proyectos concluidos para mostrar</p>
         </div>
       )}
 

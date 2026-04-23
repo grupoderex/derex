@@ -23,7 +23,6 @@ import { DesktopMenuLink } from "./DesktopMenuLink";
 import { Icon } from "@iconify/react";
 
 import { useAuthStore } from "@/stores/useAuthStore";
-import { useUIStore } from "@/stores/useUIStore";
 
 interface MobileMenuProps {
   className?: string;
@@ -55,27 +54,12 @@ export function MobileMenu({
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
   const logout = useAuthStore((state) => state.logout);
 
-  const openLoginModal = useUIStore((state) => state.openLogin);
-  const isLoginModalOpen = useUIStore((state) => state.isLoginOpen);
-
   const [favoritesOpen, setFavoritesOpen] = useState(false);
 
   return (
     <div
       className={`w-full h-full flex flex-col gap-4 px-4 py-4  ${className}`}
     >
-      {!isAuthenticated && (
-        <Button
-          className="mt-4 font-roboto"
-          onClick={() => {
-            openLoginModal();
-            setIsMenuOpen(false);
-          }}
-        >
-          <Icon icon="heroicons-outline:user" width="24" className="mr-2" />
-          {t("login")}
-        </Button>
-      )}
       <div className="[&>*]:font-display [&>*]:cursor-pointer flex items-center gap-2">
         <div
           onClick={() => {
@@ -281,7 +265,7 @@ export function MobileMenu({
           </Button>
         </>
       )}
-      {!isLoginModalOpen && favoritesOpen && (
+      {favoritesOpen && (
         <Favorites
           onClose={() => {
             setFavoritesOpen(false);

@@ -12,18 +12,15 @@ import { useGeolocation } from "@/hooks/useGeoLocation";
 import { type LocationHierarchy } from "@/models/location_hierarchy";
 import { MetadataTitle, ParsedKnowJaver } from "@/models/metadata";
 import { WebsiteMediaObject } from "@/models/website_media";
-import { toUrlCase } from "@/utils/common.utils";
 import { getResourceUrl } from "@/utils/image.utils";
 import { Icon } from "@iconify/react";
 import Image from "next/image";
-import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { HomeSearchBar } from "../components/HomeSearchBar";
 import NextLaunchesCarousel from "../components/NextLauchesCarousel";
-import { ProjectCard } from "../components/ProjectCard";
 
 interface HomeProps {
-  lang: string;
+  lang: string; // Used by commented featured section; kept so callers (page.tsx) keep compiling.
   websiteMedia: WebsiteMediaObject;
   developments: LocationHierarchy[];
   knowJaver: ParsedKnowJaver;
@@ -31,31 +28,104 @@ interface HomeProps {
 }
 
 function Home({
-  lang,
+  lang, // eslint-disable-line @typescript-eslint/no-unused-vars
   websiteMedia,
   developments,
   knowJaver,
   homeTitles,
 }: HomeProps) {
-  const { t, i18n } = useTranslation("translations");
-  const [mounted, setMounted] = useState(false);
+  const { i18n } = useTranslation("translations");
   // Geo
-  const { coords, requestPosition, permissionStatus } = useGeolocation();
+  const { coords, requestPosition } = useGeolocation();
 
-  // 1. Evitar mismatch: Usamos el lang que viene del servidor para el render inicial
-  const currentLang = mounted ? i18n.language : lang;
+  // Disabled with the geolocation CTA block; keep here to quickly re-enable that section.
+  // const { permissionStatus } = useGeolocation();
+
+  // Disabled with featured section to avoid dead code and keep reference for future rollback.
+  // const [mounted, setMounted] = useState(false);
+  // const currentLang = mounted ? i18n.language : lang;
+  // const [selectedState, setSelectedState] = useState<number | null>(() => {
+  //   const initialFeatured = developments.find((d) =>
+  //     d.ciudades.some((c) => c.proyectos.some((p) => p.outstanding === 1))
+  //   );
+  //   return initialFeatured?.id ?? null;
+  // });
 
   useEffect(() => {
-    setMounted(true);
+    // setMounted(true);
     requestPosition(false);
   }, [requestPosition]);
 
-  const [selectedState, setSelectedState] = useState<number | null>(() => {
-    const initialFeatured = developments.find((d) =>
-      d.ciudades.some((c) => c.proyectos.some((p) => p.outstanding === 1))
-    );
-    return initialFeatured?.id ?? null;
-  });
+  // Disabled with featured section.
+  // const featuredDevelopments = useMemo(() => {
+  //   if (!developments) return [];
+  //
+  //   return developments
+  //     .filter((d) =>
+  //       d.ciudades.some((c) =>
+  //         c.proyectos.some((p) => p.outstanding === 1 && p.active === 1)
+  //       )
+  //     )
+  //     .map((d) => ({
+  //       ...d,
+  //       ciudades: d.ciudades
+  //         .filter((c) =>
+  //           c.proyectos.some((p) => p.outstanding === 1 && p.active === 1)
+  //         )
+  //         .map((c) => ({
+  //           ...c,
+  //           proyectos: c.proyectos.filter(
+  //             (p) => p.outstanding === 1 && p.active === 1
+  //           ),
+  //         })),
+  //     }));
+  // }, [developments]);
+
+  // Disabled with featured section.
+  // const nearestFeaturedState = useMemo(() => {
+  //   if (!featuredDevelopments || !coords)
+  //     return {
+  //       state:
+  //         developments?.find((d) =>
+  //           d.ciudades.some((c) =>
+  //             c.proyectos.some((p) => p.outstanding === 1 && p.active === 1)
+  //           )
+  //         ) ?? null,
+  //       distance: 0,
+  //     };
+  //   return featuredDevelopments.reduce<{
+  //     state: LocationHierarchy;
+  //     distance: number;
+  //   } | null>((prev, curr) => {
+  //     const projects = curr.ciudades.flatMap((c) => c.proyectos);
+  //
+  //     const currDistance = projects.reduce((prev, curr) => {
+  //       const distance = Math.sqrt(
+  //         Math.pow(parseFloat(curr.latitud) - coords.lat, 2) +
+  //         Math.pow(parseFloat(curr.longitud) - coords.lon, 2)
+  //       );
+  //       return distance < prev ? distance : prev;
+  //     }, Infinity);
+  //
+  //     if (!prev) return { state: curr, distance: currDistance };
+  //
+  //     return currDistance < prev.distance
+  //       ? { state: curr, distance: currDistance }
+  //       : prev;
+  //   }, null);
+  // }, [featuredDevelopments, coords]);
+
+  // Disabled with featured section.
+  // useEffect(() => {
+  //   if (nearestFeaturedState?.state) {
+  //     setSelectedState(nearestFeaturedState.state.id);
+  //   } else {
+  //     const defaultFeatured = developments.find((d) =>
+  //       d.ciudades.some((c) => c.proyectos.some((p) => p.outstanding === 1))
+  //     );
+  //     setSelectedState(defaultFeatured?.id ?? developments?.[0]?.id ?? null);
+  //   }
+  // }, [nearestFeaturedState, developments]);
 
   const nearestState = useMemo(() => {
     if (!developments || !coords) return null;
@@ -80,74 +150,6 @@ function Home({
         : prev;
     }, null);
   }, [developments, coords]);
-
-  const featuredDevelopments = useMemo(() => {
-    if (!developments) return [];
-
-    return developments
-      .filter((d) =>
-        d.ciudades.some((c) =>
-          c.proyectos.some((p) => p.outstanding === 1 && p.active === 1)
-        )
-      )
-      .map((d) => ({
-        ...d,
-        ciudades: d.ciudades
-          .filter((c) =>
-            c.proyectos.some((p) => p.outstanding === 1 && p.active === 1)
-          )
-          .map((c) => ({
-            ...c,
-            proyectos: c.proyectos.filter(
-              (p) => p.outstanding === 1 && p.active === 1
-            ),
-          })),
-      }));
-  }, [developments]);
-
-  const nearestFeaturedState = useMemo(() => {
-    if (!featuredDevelopments || !coords)
-      return {
-        state:
-          developments?.find((d) =>
-            d.ciudades.some((c) =>
-              c.proyectos.some((p) => p.outstanding === 1 && p.active === 1)
-            )
-          ) ?? null,
-        distance: 0,
-      };
-    return featuredDevelopments.reduce<{
-      state: LocationHierarchy;
-      distance: number;
-    } | null>((prev, curr) => {
-      const projects = curr.ciudades.flatMap((c) => c.proyectos);
-
-      const currDistance = projects.reduce((prev, curr) => {
-        const distance = Math.sqrt(
-          Math.pow(parseFloat(curr.latitud) - coords.lat, 2) +
-          Math.pow(parseFloat(curr.longitud) - coords.lon, 2)
-        );
-        return distance < prev ? distance : prev;
-      }, Infinity);
-
-      if (!prev) return { state: curr, distance: currDistance };
-
-      return currDistance < prev.distance
-        ? { state: curr, distance: currDistance }
-        : prev;
-    }, null);
-  }, [featuredDevelopments, coords]);
-
-  useEffect(() => {
-    if (nearestFeaturedState?.state) {
-      setSelectedState(nearestFeaturedState.state.id);
-    } else {
-      const defaultFeatured = developments.find((d) =>
-        d.ciudades.some((c) => c.proyectos.some((p) => p.outstanding === 1))
-      );
-      setSelectedState(defaultFeatured?.id ?? developments?.[0]?.id ?? null);
-    }
-  }, [nearestFeaturedState, developments]);
 
   const homeMediaUrl = websiteMedia?.home_video ?? "";
   const isHomeMediaVideo = /\.(mp4|webm|ogg)(\?.*)?$/i.test(homeMediaUrl);
@@ -193,7 +195,7 @@ function Home({
         <div className="absolute -bottom-1 h-[80vh] w-full home-gradient" />
 
         <div className="absolute top-0 h-[80vh] w-full lg:bottom-0 lg:h-[70vh]">
-          <div className="container flex lg:items-end items-center justify-center h-full lg:pb-16">
+          <div className="container flex lg:items-end items-center justify-center h-full lg:pb-24">
             <div className="relative w-full flex justify-center">
               <HomeSearchBar
                 selectedState={nearestState?.state?.name}
@@ -201,7 +203,7 @@ function Home({
                 homeTitles={homeTitles}
               />
 
-              <div className="absolute top-full left-0 w-full flex justify-center mt-4">
+              {/* <div className="absolute top-full left-0 w-full flex justify-center mt-4">
                 {(permissionStatus === "prompt" ||
                   permissionStatus === "unknown") && (
                     <Button
@@ -214,7 +216,7 @@ function Home({
                       {t("findNearMe") ?? "Ver desarrollos cerca de mí"}
                     </Button>
                   )}
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -232,7 +234,7 @@ function Home({
         nearestState={nearestState}
       />
 
-      <section className="container py-10 max-2xl:max-w-7xl">
+      {/* <section className="container py-10 max-2xl:max-w-7xl">
         {featuredDevelopments.length > 0 && (
           <>
             <div className="flex flex-col">
@@ -243,13 +245,13 @@ function Home({
                   ? homeTitles?.home_featuredDevelopmentsUp?.value_en
                   : homeTitles?.home_featuredDevelopmentsUp?.value}
               </h3>
-              {/* <h3
+              <h3
                 className={`${homeTitles?.home_featuredDevelopmentsDown?.className} ml-16 -mt-5`}
               >
                 {currentLang === "en"
                   ? homeTitles?.home_featuredDevelopmentsDown?.value_en
                   : homeTitles?.home_featuredDevelopmentsDown?.value}
-              </h3> */}
+              </h3>
             </div>
 
             <div className="flex flex-row gap-2 items-center justify-center mt-10 flex-wrap">
@@ -292,7 +294,7 @@ function Home({
             </div>
           </>
         )}
-      </section>
+      </section> */}
 
       <section
         className={`lg:h-[480px] flex flex-col gap-8 my-8  xl:max-w-[1700px] mx-0 px-8 w-full ${knowJaver?.isImageLeft === "true"
