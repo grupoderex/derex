@@ -134,19 +134,19 @@ export default function StatePage({
     <div className="mb-8">
       {SHOULD_LOAD_GOOGLE_MAPS && (
         <div className="fixed md:hidden bottom-4 z-10 w-full px-4">
-        <Button className="w-full" onClick={toggleMap}>
-          {isMapVisible ? (
-            <>
-              <Icon icon="heroicons:list-bullet" width="24" className="mr-2" />
-              {t("seeList")}
-            </>
-          ) : (
-            <>
-              <Icon icon="heroicons:map-pin" width="24" className="mr-2" />
-              {t("seeMap")}
-            </>
-          )}
-        </Button>
+          <Button className="w-full" onClick={toggleMap}>
+            {isMapVisible ? (
+              <>
+                <Icon icon="heroicons:list-bullet" width="24" className="mr-2" />
+                {t("seeList")}
+              </>
+            ) : (
+              <>
+                <Icon icon="heroicons:map-pin" width="24" className="mr-2" />
+                {t("seeMap")}
+              </>
+            )}
+          </Button>
         </div>
       )}
 
@@ -182,11 +182,11 @@ export default function StatePage({
                       -{" "}
                       {zone.max
                         ? new Intl.NumberFormat("es-MX", {
-                            style: "currency",
-                            currency: "MXN",
+                          style: "currency",
+                          currency: "MXN",
                           minimumFractionDigits: 0,
                           maximumFractionDigits: 0,
-                          }).format(zone.max)
+                        }).format(zone.max)
                         : "Más"}
                     </SelectItem>
                   ))}
@@ -216,21 +216,21 @@ export default function StatePage({
             </div>
             {SHOULD_LOAD_GOOGLE_MAPS && (
               <Button className="max-md:hidden" onClick={toggleMap}>
-              {isMapVisible ? (
-                <>
-                  <Icon
-                    icon="heroicons:list-bullet"
-                    width="24"
-                    className="mr-2"
-                  />
-                  {t("seeList")}
-                </>
-              ) : (
-                <>
-                  <Icon icon="heroicons:map-pin" width="24" className="mr-2" />
-                  {t("seeMap")}
-                </>
-              )}
+                {isMapVisible ? (
+                  <>
+                    <Icon
+                      icon="heroicons:list-bullet"
+                      width="24"
+                      className="mr-2"
+                    />
+                    {t("seeList")}
+                  </>
+                ) : (
+                  <>
+                    <Icon icon="heroicons:map-pin" width="24" className="mr-2" />
+                    {t("seeMap")}
+                  </>
+                )}
               </Button>
             )}
           </div>
@@ -238,9 +238,8 @@ export default function StatePage({
         <div className={`flex flex-col-reverse lg:flex-row ${isMapVisible ? "gap-8" : ""}`}>
           {/* LISTA DE PROYECTOS: Solo visible si NO estamos viendo el mapa en mobile */}
           <div
-            className={`flex min-w-0 flex-col gap-16 pt-16 grow transition-all ${
-              isMapVisible ? "max-lg:hidden" : ""
-            }`}
+            className={`flex min-w-0 flex-col gap-16 pt-4 grow transition-all ${isMapVisible ? "max-lg:hidden" : ""
+              }`}
           >
             {filteredZones?.length === 0 ? (
               <h5 className="text-gray-500">{t("noDevelopmentsFound")}</h5>
@@ -249,7 +248,7 @@ export default function StatePage({
               <div key={zone.city_id}>
                 <h3 className="font-bold">{zone.city_name}</h3>
                 <hr className="border-primary my-4 border" />
-                <div className="flex flex-col gap-5 ">
+                <div className="flex flex-col gap-8 ">
                   {zone.projects.map((project, index) => (
                     <ProjectCard
                       key={project.project_id}
@@ -283,70 +282,69 @@ export default function StatePage({
           {/* CONTENEDOR DEL MAPA */}
           {SHOULD_LOAD_GOOGLE_MAPS && (
             <div
-            className={`relative lg:mt-[120px] w-full shrink-0 transition-all ${
-              isMapVisible
+              className={`relative lg:mt-[120px] w-full shrink-0 transition-all ${isMapVisible
                 ? "lg:w-[460px] xl:w-[500px] h-[90vh]"
                 : "!w-0 h-0 overflow-hidden"
-            }`}
-          >
-            {hasMapInitialized || isMapVisible ? (
-              <MapErrorBoundary>
-                <APIProvider apiKey={GOOGLE_MAPS_KEY ?? ""}>
-                  <Map
-                    mapId="states_map"
-                    defaultCenter={initialCenter}
-                    defaultZoom={12}
-                    className="w-full h-full"
-                    disableDefaultUI={true}
-                  >
-                    <MapCameraControl
-                      boundsData={filteredZonesLatLngs}
-                      highlightedProjectId={showPinPopover}
-                      isMapVisible={isMapVisible}
-                    />
+                }`}
+            >
+              {hasMapInitialized || isMapVisible ? (
+                <MapErrorBoundary>
+                  <APIProvider apiKey={GOOGLE_MAPS_KEY ?? ""}>
+                    <Map
+                      mapId="states_map"
+                      defaultCenter={initialCenter}
+                      defaultZoom={12}
+                      className="w-full h-full"
+                      disableDefaultUI={true}
+                    >
+                      <MapCameraControl
+                        boundsData={filteredZonesLatLngs}
+                        highlightedProjectId={showPinPopover}
+                        isMapVisible={isMapVisible}
+                      />
 
-                    {filteredZonesLatLngs?.map(({ project, lat, lng }, index) => (
-                      <AdvancedMarker
-                        key={index}
-                        position={{
-                          lat,
-                          lng,
-                        }}
-                        onClick={() => {
-                          if (showPinPopover !== project.project_id) {
-                            setShowPinPopover(project.project_id);
-                          }
-                        }}
-                        className="flex flex-col items-center"
-                        title={project.project_name || "Proyecto Javer"}
-                        aria-label={`Ver mapa de ${project.project_name}`}
-                      >
-                        {showPinPopover === project.project_id && (
-                          <MapProjectInfo
-                            project={project}
-                            onClose={() => {
-                              setTimeout(() => {
-                                setShowPinPopover(null);
-                              }, 100);
-                            }}
+                      {filteredZonesLatLngs?.map(({ project, lat, lng }, index) => (
+                        <AdvancedMarker
+                          key={index}
+                          position={{
+                            lat,
+                            lng,
+                          }}
+                          onClick={() => {
+                            if (showPinPopover !== project.project_id) {
+                              setShowPinPopover(project.project_id);
+                            }
+                          }}
+                          className="flex flex-col items-center"
+                          title={project.project_name || "Proyecto Javer"}
+                          aria-label={`Ver mapa de ${project.project_name}`}
+                        >
+                          {showPinPopover === project.project_id && (
+                            <MapProjectInfo
+                              project={project}
+                              onClose={() => {
+                                setTimeout(() => {
+                                  setShowPinPopover(null);
+                                }, 100);
+                              }}
+                            />
+                          )}
+                          <JaverMarker
+                            color={
+                              hoveredProject === project.project_id ||
+                                selectedProject === project.project_id ||
+                                showPinPopover === project.project_id
+                                ? undefined
+                                : "black"
+                            }
+                            size={32}
                           />
-                        )}
-                        <JaverMarker
-                          color={
-                            hoveredProject === project.project_id ||
-                            selectedProject === project.project_id ||
-                            showPinPopover === project.project_id
-                              ? undefined
-                              : "black"
-                          }
-                          size={32}
-                        />
-                      </AdvancedMarker>
-                    ))}
-                  </Map>
-                </APIProvider>
-              </MapErrorBoundary>
-            ) : null}
+                        </AdvancedMarker>
+                      ))}
+                    </Map>
+                  </APIProvider>
+                </MapErrorBoundary>
+              ) : null}
             </div>
           )}
         </div>

@@ -373,7 +373,7 @@ function ProjectCardBase({
 
           <div className="bg-slate-400 w-full h-[1px] opacity-40 my-2"></div>
 
-          <div className="flex flex-row justify-between w-full grow items-center">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between w-full gap-4">
             <div className="flex flex-col md:flex-row md:items-center gap-4 md:justify-evenly">
               {initialProject?.promotion_active === 1 && (
                 <PromotionTag projectCard={true} />
@@ -381,42 +381,31 @@ function ProjectCardBase({
               {!!project?.is_presale && <PresaleBadge />}
               {project?.hasPropertyWithEdgeCertification && <EdgeLogo />}
             </div>
-            <Button
-              variant="outline"
-              className="hidden lg:flex items-center self-center mt-1 font- absolute text-sm "
-              onClick={(e) => {
-                e.stopPropagation();
-                window.location.href = `${projectUrl}#contact-section`;
-              }}
-            >
-              {t("contactUs")}
-              <Icon icon="heroicons-solid:mail" width="24" className="ml-2" />
-            </Button>
-            <Button asChild variant="ghost">
-              <Link className="font- text-sm" href={projectUrl}>
-                {t("seeMore")}
-                <Icon
-                  icon="heroicons-solid:arrow-right"
-                  width="24"
-                  className="ml-2"
-                />
-              </Link>
-            </Button>
+            <div className="flex flex-col items-center gap-2 lg:flex-row lg:items-center lg:justify-end w-full lg:w-auto">
+              <Button
+                variant="outline"
+                className="w-full lg:w-auto text-sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  window.location.href = `${projectUrl}#contact-section`;
+                }}
+              >
+                {t("contactUs")}
+                <Icon icon="heroicons-solid:mail" width="24" className="ml-2" />
+              </Button>
+              <Button asChild variant="ghost" className="w-full lg:w-auto">
+                <Link className="text-sm" href={projectUrl}>
+                  {t("seeMore")}
+                  <Icon
+                    icon="heroicons-solid:arrow-right"
+                    width="24"
+                    className="ml-2"
+                  />
+                </Link>
+              </Button>
+            </div>
           </div>
-
-          <Button
-            variant="outline"
-            className="lg:hidden self-center mt-1 font- text-sm"
-            onClick={(e) => {
-              e.stopPropagation();
-              window.location.href = `${projectUrl}#contact-section`;
-            }}
-          >
-            {t("contactUs")}
-            <Icon icon="heroicons-solid:mail" width="24" className="ml-2" />
-          </Button>
         </div>
-
 
       </CardContent>
     </Card>
