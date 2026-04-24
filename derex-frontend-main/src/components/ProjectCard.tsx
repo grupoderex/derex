@@ -213,9 +213,9 @@ function ProjectCardBase({
                 width={96}
                 height={96}
                 className={`w-24 h-24 bg-white rounded-2xl object-contain p-2 border lg:block ${isGalleryEnabled &&
-                    ((formattedAmenityImages?.length ?? 0) > 0 || project?.thumbnail)
-                    ? "hidden"
-                    : ""
+                  ((formattedAmenityImages?.length ?? 0) > 0 || project?.thumbnail)
+                  ? "hidden"
+                  : ""
                   }`}
                 src={projectLogoUrl}
                 alt={
