@@ -4,20 +4,20 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { BACKEND_URL, RECAPTCHA_SITE_KEY } from "@/constants";
 import { Project } from "@/models/project";
 import {
-    EMAIL_REGEX,
-    MESSAGE_REGEX,
-    NAME_REGEX,
-    PHONE_REGEX,
+  EMAIL_REGEX,
+  MESSAGE_REGEX,
+  NAME_REGEX,
+  PHONE_REGEX,
 } from "@/utils/regex";
 import { subYears } from "date-fns";
 import { enUS, es } from "date-fns/locale";
@@ -112,6 +112,14 @@ export const ContactForm = ({
       }}
       validationSchema={validationSchema}
       onSubmit={async (values, { resetForm }) => {
+        // Format birthDate to YYYY-MM-DD string for backend validation
+        const formatDateToString = (date: Date): string => {
+          const year = date.getFullYear();
+          const month = String(date.getMonth() + 1).padStart(2, "0");
+          const day = String(date.getDate()).padStart(2, "0");
+          return `${year}-${month}-${day}`;
+        };
+
         await fetch(`${BACKEND_URL}/contact/submit`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -120,14 +128,34 @@ export const ContactForm = ({
             firstName: values.firstName,
             lastName: values.lastName,
             email: values.email,
-            birthDate: values.birthDate,
+            birthDate: values.birthDate instanceof Date
+              ? formatDateToString(values.birthDate)
+              : values.birthDate,
             phone: values.phone,
             development: values.development,
             typeOfCredit: values.typeOfCredit,
             message: values.message,
           }),
         })
-          .then(() => {
+          .then(async (response) => {
+            if (!response.ok) {
+              let backendMessage = "Error en el envío de la información";
+              try {
+                const data = await response.json();
+                const firstValidationError = data?.stack
+                  ? Object.values(data.stack as Record<string, { msg?: string }>)[0]
+                  : null;
+                backendMessage =
+                  firstValidationError?.msg ||
+                  data?.error ||
+                  data?.message ||
+                  backendMessage;
+              } catch {
+                // Keep default message when backend response is not JSON
+              }
+              throw new Error(backendMessage);
+            }
+
             resetForm();
 
             if (typeof window !== "undefined" && (window as any).dataLayer) {

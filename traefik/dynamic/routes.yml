@@ -7,11 +7,26 @@ http:
       middlewares: [https-redirect]
       service: frontend
 
-    frontend:
-      rule: 'Host(`{{ env "DOMAIN" }}`) || Host(`www.{{ env "DOMAIN" }}`)'
+    frontend-apex:
+      rule: 'Host(`{{ env "DOMAIN" }}`)'
       entrypoints: [websecure]
       tls:
         certResolver: letsencrypt
+        domains:
+          - main: '{{ env "DOMAIN" }}'
+            sans:
+              - 'www.{{ env "DOMAIN" }}'
+      service: frontend
+
+    frontend-www:
+      rule: 'Host(`www.{{ env "DOMAIN" }}`)'
+      entrypoints: [websecure]
+      tls:
+        certResolver: letsencrypt
+        domains:
+          - main: 'www.{{ env "DOMAIN" }}'
+            sans:
+              - '{{ env "DOMAIN" }}'
       middlewares: [www-to-root]
       service: frontend
 
