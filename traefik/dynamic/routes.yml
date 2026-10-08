@@ -1,5 +1,77 @@
 http:
   routers:
+    # ── Javer QA Frontend (apex + www) ───────────────────────────────────────
+    javerqa-frontend-http:
+      rule: 'Host(`javerqa.online`) || Host(`www.javerqa.online`)'
+      entrypoints: [web]
+      middlewares: [https-redirect]
+      service: javerqa-frontend
+
+    javerqa-frontend-apex:
+      rule: 'Host(`javerqa.online`)'
+      entrypoints: [websecure]
+      tls:
+        certResolver: letsencrypt
+        domains:
+          - main: 'javerqa.online'
+            sans:
+              - 'www.javerqa.online'
+      service: javerqa-frontend
+
+    javerqa-frontend-www:
+      rule: 'Host(`www.javerqa.online`)'
+      entrypoints: [websecure]
+      tls:
+        certResolver: letsencrypt
+        domains:
+          - main: 'www.javerqa.online'
+            sans:
+              - 'javerqa.online'
+      middlewares: [www-to-root]
+      service: javerqa-frontend
+
+    # ── Javer QA Backend API ─────────────────────────────────────────────────
+    javerqa-backend-http:
+      rule: 'Host(`api.javerqa.online`)'
+      entrypoints: [web]
+      middlewares: [https-redirect]
+      service: javerqa-backend
+
+    javerqa-backend:
+      rule: 'Host(`api.javerqa.online`)'
+      entrypoints: [websecure]
+      tls:
+        certResolver: letsencrypt
+      service: javerqa-backend
+
+    # ── Javer QA Admin panel ─────────────────────────────────────────────────
+    javerqa-admin-http:
+      rule: 'Host(`admin.javerqa.online`)'
+      entrypoints: [web]
+      middlewares: [https-redirect]
+      service: javerqa-admin
+
+    javerqa-admin:
+      rule: 'Host(`admin.javerqa.online`)'
+      entrypoints: [websecure]
+      tls:
+        certResolver: letsencrypt
+      service: javerqa-admin
+
+    # ── Javer QA Blog (Strapi) ───────────────────────────────────────────────
+    javerqa-blog-http:
+      rule: 'Host(`blog.javerqa.online`)'
+      entrypoints: [web]
+      middlewares: [https-redirect]
+      service: javerqa-blog
+
+    javerqa-blog:
+      rule: 'Host(`blog.javerqa.online`)'
+      entrypoints: [websecure]
+      tls:
+        certResolver: letsencrypt
+      service: javerqa-blog
+
     # ── Frontend (apex + www) ─────────────────────────────────────────────────
     frontend-http:
       rule: 'Host(`{{ env "DOMAIN" }}`) || Host(`www.{{ env "DOMAIN" }}`)'
@@ -72,6 +144,22 @@ http:
         certResolver: letsencrypt
       service: blog
 
+    # ── Javer Querétaro landing API (host process) ───────────────────────────
+    javer-queretaro-http:
+      rule: 'Host(`api.javer-queretaro.com`)'
+      entrypoints: [web]
+      middlewares: [https-redirect]
+      service: javer-queretaro
+
+    javer-queretaro:
+      rule: 'Host(`api.javer-queretaro.com`)'
+      entrypoints: [websecure]
+      tls:
+        certResolver: letsencrypt
+        domains:
+          - main: 'api.javer-queretaro.com'
+      service: javer-queretaro
+
   middlewares:
     www-to-root:
       redirectRegex:
@@ -80,6 +168,26 @@ http:
         permanent: true
 
   services:
+    javerqa-frontend:
+      loadBalancer:
+        servers:
+          - url: 'http://javerqa-frontend-1:3000'
+
+    javerqa-backend:
+      loadBalancer:
+        servers:
+          - url: 'http://javerqa-backend-1:3000'
+
+    javerqa-admin:
+      loadBalancer:
+        servers:
+          - url: 'http://javerqa-admin-1:80'
+
+    javerqa-blog:
+      loadBalancer:
+        servers:
+          - url: 'http://javerqa-blog-1:1337'
+
     frontend:
       loadBalancer:
         servers:
@@ -99,3 +207,8 @@ http:
       loadBalancer:
         servers:
           - url: 'http://derex-blog-1:1337'
+
+    javer-queretaro:
+      loadBalancer:
+        servers:
+          - url: 'http://172.18.0.1:3000'

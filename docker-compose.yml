@@ -233,5 +233,7 @@ volumes:
     # ─── Networks ─────────────────────────────────────────────────────────────────
 networks:
   web:
+    external: true
+    name: shared_web
   internal:
     internal: true # MySQL cannot reach the internet; services on both networks can
