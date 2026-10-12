@@ -2,31 +2,6 @@ name: derex
 
 services:
 
-  # ─── Traefik (reverse proxy + TLS) ───────────────────────────────────────────
-  traefik:
-    image: traefik:v3.3
-    restart: always
-    environment:
-      DOMAIN: ${DOMAIN}
-    ports:
-      - "80:80"
-      - "443:443"
-    command:
-      - "--api.dashboard=false"
-      - "--log.level=INFO"
-      - "--entrypoints.web.address=:80"
-      - "--entrypoints.websecure.address=:443"
-      - "--providers.file.directory=/etc/traefik/dynamic"
-      - "--providers.file.watch=true"
-      - "--certificatesresolvers.letsencrypt.acme.email=${ACME_EMAIL}"
-      - "--certificatesresolvers.letsencrypt.acme.storage=/acme/acme.json"
-      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
-    volumes:
-      - ./traefik/dynamic:/etc/traefik/dynamic:ro
-      - traefik-certs:/acme
-    networks:
-      - web
-
   # ─── Frontend (Next.js SSR) ───────────────────────────────────────────────────
   frontend:
     build:
@@ -226,7 +201,6 @@ services:
 # ─── Named volumes ────────────────────────────────────────────────────────────
 volumes:
   mysql-data:
-  traefik-certs:
   strapi-uploads:
   backend-uploads:
 

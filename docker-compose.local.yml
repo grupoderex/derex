@@ -1,8 +1,4 @@
 services:
-  traefik:
-    profiles:
-      - qa-only
-
   frontend:
     build:
       dockerfile: Dockerfile.local

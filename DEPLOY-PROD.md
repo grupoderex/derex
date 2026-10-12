@@ -3,7 +3,7 @@
 ## 1. Requisitos previos en el VPS de producción
 
 - Docker Engine + Docker Compose plugin instalados
-- Puertos **80** y **443** abiertos
+- El proxy independiente en `/var/www/traefik` ya publica los puertos **80** y **443**. Este proyecto no levanta Traefik.
 - DNS apuntando al IP del VPS (registros A para `derex.com.mx`, `www.`, `api.`, `admin.`, `blog.`)
 
 ## 2. Preparar el archivo de entorno
@@ -13,7 +13,7 @@ Edita `.env.prod` y reemplaza todos los valores marcados con `# CAMBIAR`:
 | Variable | Qué poner |
 |---|---|
 | `DOMAIN` | Dominio real (ej. `derex.com.mx`) |
-| `ACME_EMAIL` | Email para certificados Let's Encrypt |
+| `ACME_EMAIL` | No lo usa este Compose. El certificado lo pide `/var/www/traefik/.env` |
 | `LOCAL_MEDIA_BASE_URL` | `https://api.TU_DOMINIO` |
 | `RECAPTCHA_SECRET_KEY` | Secret key de reCAPTCHA producción |
 | `NEXT_PUBLIC_RECAPTCHA_SITE_KEY` | Site key de reCAPTCHA producción |

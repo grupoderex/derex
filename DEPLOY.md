@@ -1,10 +1,9 @@
 # Derex Deployment Guide
 
 ## Overview
-This repository is deployed with Docker Compose and Traefik using a single compose file and environment-specific env files.
+This repository is deployed with Docker Compose and environment-specific env files. TLS and ports 80 and 443 belong to the independent proxy in `/var/www/traefik`. This compose file does not start Traefik.
 
 Services:
-- Traefik
 - Frontend (Next.js SSR)
 - Backend (Node.js Express)
 - Admin (React SPA + NGINX)
@@ -87,7 +86,7 @@ Create A records pointing to your VPS public IP:
 
 ### B) VPS Setup
 - Install Docker Engine and Docker Compose plugin.
-- Open inbound ports: 80 and 443.
+- Ports 80 and 443 stay published by the proxy in `/var/www/traefik`, on the external network `shared_web`.
 
 ### C) Database
 - Import your SQL dump into MySQL (`derex` and `derex_strapi` as needed).
